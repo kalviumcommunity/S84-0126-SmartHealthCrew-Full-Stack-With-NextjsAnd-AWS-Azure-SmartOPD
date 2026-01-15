@@ -202,9 +202,3 @@ The focus is on **clarity, feasibility, and execution**, not unnecessary complex
 **SmartHealthCrew**
 
 Collaborative team working on accessible healthcare technology solutions.
-
----
-
-## License
-
-This project is developed strictly for **educational and learning purposes**.
