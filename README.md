@@ -38,52 +38,131 @@ Hospitals in Tier-2 and Tier-3 cities face significant challenges:
 
 ## 🚀 Rendering Strategies Implementation
 
-This project demonstrates three Next.js rendering modes applied to SmartOPD:
+### 1️⃣ Static Rendering (SSG) - About Page
 
-### 1. **Static Rendering (SSG)** - About Page
-- **Route:** `/about`
-- **Configuration:** `export const revalidate = false;`
-- **Why:** About page content rarely changes
-- **Benefits:** 
-  - ⚡ Lightning-fast page loads (served from CDN)
-  - 💰 Minimal server costs
-  - 📈 Infinite scalability
+**File:** `src/app/about/page.tsx`
 
-### 2. **Dynamic Rendering (SSR)** - Live Queue Status
-- **Route:** `/live-queue`
-- **Configuration:** `export const dynamic = 'force-dynamic';`
-- **Why:** Queue data changes constantly and must be accurate
-- **Benefits:**
-  - 🔄 Always fresh data on every request
-  - ⏱️ Real-time accuracy critical for hospitals
-  - 🏥 Patient safety depends on current information
+```tsx
+// STATIC RENDERING (SSG) — Pre-rendered at build time
+export const revalidate = false; // No re-rendering after build
 
-### 3. **Hybrid Rendering (ISR)** - System Updates
-- **Route:** `/updates`
-- **Configuration:** `export const revalidate = 60;`
-- **Why:** Hospital announcements change periodically but don't need instant updates
-- **Benefits:**
-  - ⚡ Fast like static (cached)
-  - 🔄 Fresh content every 60 seconds
-  - 💰 Balanced cost and performance
+export default function About() {
+  return (
+    <div>
+      <h1>About SmartOPD</h1>
+      <p>This page is pre-rendered at build time using SSG.</p>
+    </div>
+  );
+}
+```
+
+**Why SSG for About Page:**
+- Content rarely changes
+- Fastest load time (served from CDN)
+- Zero server cost per request
+- Perfect for static information
 
 ---
 
-## 📊 DailyEdge Case Study Analysis
+### 2️⃣ Dynamic Rendering (SSR) - Live Queue Status
 
-**Problem:** DailyEdge news portal had outdated headlines with SSG, but switching to SSR made pages slow and expensive.
+**File:** `src/app/live-queue/page.tsx`
 
-**Solution Applied to SmartOPD:**
-- **About Page (SSG):** Rarely changes → build once, serve fast
-- **Live Queue (SSR):** Changes every second → must be real-time
-- **Updates (ISR):** Changes hourly → perfect balance with 60s revalidation
+```tsx
+// DYNAMIC RENDERING (SSR) — Always fresh data
+export const dynamic = 'force-dynamic';
 
-**Trade-off Triangle:**
-- **Speed** ⚡ - How fast pages load
-- **Freshness** 🔄 - How current the data is
-- **Scalability** 📈 - Cost and server load
+export default async function LiveQueue() {
+  const res = await fetch("https://dummyjson.com/posts/1", { cache: "no-store" });
+  const data = await res.json();
 
-Each rendering mode gives you two of these — choose wisely based on your use case!
+  return (
+    <div>
+      <h1>Live Queue Status (SSR)</h1>
+      <p>Data fetched at request time: {data.title}</p>
+    </div>
+  );
+}
+```
+
+**Why SSR for Live Queue:**
+- Queue status changes rapidly
+- Real-time data essential for accuracy
+- Fresh response on every request
+- Critical for hospital operations
+
+---
+
+### 3️⃣ Hybrid Rendering (ISR) - SmartOPD Updates
+
+**File:** `src/app/news/page.tsx`
+
+```tsx
+// HYBRID RENDERING (ISR) — Regenerates every 60s
+export const revalidate = 60;
+
+export default async function News() {
+  const res = await fetch("https://dummyjson.com/posts", { next: { revalidate: 60 }});
+  const data = await res.json();
+
+  return (
+    <div>
+      <h1>SmartOPD Updates (ISR)</h1>
+      <p>This page updates every 60 seconds using ISR.</p>
+      <p>Fetched posts: {data.posts.length}</p>
+    </div>
+  );
+}
+```
+
+**Why ISR for Updates:**
+- Updates occasionally, not every second
+- Speed of static pages + periodic freshness
+- Reduced cost compared to SSR
+- Perfect balance for announcements
+
+---
+
+## 📊 Case Study: DailyEdge News Portal
+
+### Problem Summary
+DailyEdge statically generated their homepage → **fast but breaking news became stale**.  
+They switched to SSR → **fresh but slow and expensive** due to high server load.
+
+### Trade-Off Triangle
+
+| Rendering | Speed | Freshness | Scalability |
+|----------|--------|-----------|-------------|
+| SSG | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐⭐⭐ |
+| SSR | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
+| ISR | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+
+### Proposed Balanced Solution
+- Use **ISR** for Breaking News → updates every 30–60 seconds
+- Use **SSG** for evergreen articles
+- Use **SSR** only for heavy personalized pages (dashboards)
+
+**Result:** Reduces cost, improves speed, and keeps content reasonably fresh.
+
+### Applied to SmartOPD
+
+| Page | Rendering Mode | Reason |
+|------|----------------|--------|
+| About | SSG | No frequent changes |
+| Live Queue | SSR | Must always be fresh |
+| SmartOPD Updates | ISR | Changes occasionally |
+
+This combination balances:
+- **Speed** ⚡ - Fast page loads
+- **Real-time accuracy** 🔄 - When needed
+- **Cost-efficiency** 💰 - Optimized resources
+
+**Trade-off Insight:**
+- SSG gives you: Speed + Scalability (but stale data)
+- SSR gives you: Freshness + Accuracy (but slower + costly)
+- ISR gives you: Speed + Reasonable Freshness (balanced approach)
+
+Each rendering mode gives you **two out of three** — choose wisely!
 
 ---
 
@@ -112,13 +191,13 @@ Each rendering mode gives you two of these — choose wisely based on your use c
 SmartOPD/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx              # Home page (SSG+SSR+ISR overview)
+│   │   ├── page.tsx              # Home page
 │   │   ├── about/
 │   │   │   └── page.tsx          # About SmartOPD (SSG)
 │   │   ├── live-queue/
 │   │   │   └── page.tsx          # Live Queue Status (SSR)
-│   │   ├── updates/
-│   │   │   └── page.tsx          # System Updates (ISR)
+│   │   ├── news/
+│   │   │   └── page.tsx          # SmartOPD Updates (ISR)
 │   │   ├── layout.tsx            # Root layout
 │   │   └── globals.css           # Global styles
 │   │
@@ -174,10 +253,10 @@ npm start
 
 | Page | Route | Rendering | Revalidation | Use Case |
 |------|-------|-----------|--------------|----------|
-| **Home** | `/` | Mixed | N/A | Landing page with all three mode explanations |
+| **Home** | `/` | Mixed | N/A | Landing page |
 | **About SmartOPD** | `/about` | SSG | `false` | Static content, rarely changes |
 | **Live Queue Status** | `/live-queue` | SSR | N/A | Real-time queue data, always fresh |
-| **System Updates** | `/updates` | ISR | `60s` | Periodic updates, balanced performance |
+| **SmartOPD Updates** | `/news` | ISR | `60s` | Periodic updates, balanced performance |
 
 ---
 
