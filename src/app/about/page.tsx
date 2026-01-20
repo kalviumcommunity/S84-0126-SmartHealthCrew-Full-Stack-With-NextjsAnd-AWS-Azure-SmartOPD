@@ -12,7 +12,10 @@ export default function About() {
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Link
+              href="/"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg">
                 S
               </div>
@@ -22,9 +25,24 @@ export default function About() {
               </div>
             </Link>
             <div className="flex items-center gap-6">
-              <Link href="/" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Home</Link>
-              <Link href="/live-queue" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Live Queue</Link>
-              <Link href="/news" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Updates</Link>
+              <Link
+                href="/"
+                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+              >
+                Home
+              </Link>
+              <Link
+                href="/live-queue"
+                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+              >
+                Live Queue
+              </Link>
+              <Link
+                href="/news"
+                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+              >
+                Updates
+              </Link>
             </div>
           </div>
         </nav>
@@ -37,9 +55,12 @@ export default function About() {
             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
             Static Rendering (SSG)
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">About SmartOPD</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            About SmartOPD
+          </h1>
           <p className="text-xl text-gray-600">
-            A lightweight, web-based digital queue management system for Tier-2/3 city hospitals
+            A lightweight, web-based digital queue management system for
+            Tier-2/3 city hospitals
           </p>
         </div>
 
@@ -47,9 +68,12 @@ export default function About() {
         <div className="space-y-6">
           {/* Problem Statement */}
           <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">The Problem We're Solving</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              The Problem We&apos;re Solving
+            </h2>
             <p className="text-gray-700 mb-4">
-              Hospitals in Tier-2 and Tier-3 cities still rely on physical queues for OPD appointments, leading to:
+              Hospitals in Tier-2 and Tier-3 cities still rely on physical
+              queues for OPD appointments, leading to:
             </p>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
@@ -57,8 +81,12 @@ export default function About() {
                   <span className="text-red-600 text-sm">✕</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Long Waiting Times</h3>
-                  <p className="text-sm text-gray-600">Patient frustration and poor experience</p>
+                  <h3 className="font-semibold text-gray-900">
+                    Long Waiting Times
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Patient frustration and poor experience
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -76,7 +104,9 @@ export default function About() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Inefficiency</h3>
-                  <p className="text-sm text-gray-600">Poor resource utilization</p>
+                  <p className="text-sm text-gray-600">
+                    Poor resource utilization
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -85,7 +115,9 @@ export default function About() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">High Costs</h3>
-                  <p className="text-sm text-gray-600">Expensive systems unaffordable</p>
+                  <p className="text-sm text-gray-600">
+                    Expensive systems unaffordable
+                  </p>
                 </div>
               </div>
             </div>
@@ -93,9 +125,12 @@ export default function About() {
 
           {/* Solution */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Solution</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Our Solution
+            </h2>
             <p className="text-gray-700 mb-6">
-              SmartOPD provides a lightweight digital queue system with zero hardware requirements:
+              SmartOPD provides a lightweight digital queue system with zero
+              hardware requirements:
             </p>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white rounded-xl p-6">
@@ -141,11 +176,15 @@ export default function About() {
 
           {/* Tech Stack */}
           <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Technology Stack</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Technology Stack
+            </h2>
             <div className="grid md:grid-cols-3 gap-6">
               <div>
                 <div className="text-3xl mb-2">⚙️</div>
-                <h3 className="font-semibold text-gray-900 mb-1">Frontend & Backend</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  Frontend & Backend
+                </h3>
                 <p className="text-sm text-gray-600">Next.js with TypeScript</p>
               </div>
               <div>
@@ -156,45 +195,63 @@ export default function About() {
               <div>
                 <div className="text-3xl mb-2">⚡</div>
                 <h3 className="font-semibold text-gray-900 mb-1">Caching</h3>
-                <p className="text-sm text-gray-600">Redis for real-time updates</p>
+                <p className="text-sm text-gray-600">
+                  Redis for real-time updates
+                </p>
               </div>
             </div>
           </div>
 
           {/* Why SSG */}
           <div className="bg-green-50 rounded-2xl p-8 border border-green-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Why This Page Uses Static Rendering (SSG)</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              Why This Page Uses Static Rendering (SSG)
+            </h2>
             <p className="text-gray-700 mb-4">
-              The About page content doesn't change frequently. By using Static Site Generation:
+              The About page content doesn&apos;t change frequently. By using
+              Static Site Generation:
             </p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <span className="text-green-600 text-xl">⚡</span>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Lightning Fast</h3>
-                  <p className="text-sm text-gray-600">Pre-rendered HTML loads instantly from CDN</p>
+                  <h3 className="font-semibold text-gray-900">
+                    Lightning Fast
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Pre-rendered HTML loads instantly from CDN
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-green-600 text-xl">💰</span>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Cost Efficient</h3>
-                  <p className="text-sm text-gray-600">No server computation on each visit</p>
+                  <h3 className="font-semibold text-gray-900">
+                    Cost Efficient
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    No server computation on each visit
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-green-600 text-xl">📈</span>
                 <div>
                   <h3 className="font-semibold text-gray-900">Scales Easily</h3>
-                  <p className="text-sm text-gray-600">Handles thousands of visitors simultaneously</p>
+                  <p className="text-sm text-gray-600">
+                    Handles thousands of visitors simultaneously
+                  </p>
                 </div>
               </div>
             </div>
             <div className="mt-6 bg-white rounded-lg p-4">
               <p className="text-xs text-gray-500 mb-1">Page built at:</p>
-              <code className="text-sm font-mono text-gray-700">{buildTime}</code>
+              <code className="text-sm font-mono text-gray-700">
+                {buildTime}
+              </code>
               <p className="text-xs text-gray-500 mt-2">
-                💡 Refresh the page - this timestamp won't change until the app is rebuilt
+                💡 Refresh the page - this timestamp won&apos;t change until the
+                app is rebuilt
               </p>
             </div>
           </div>

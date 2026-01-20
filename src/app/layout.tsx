@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "SmartOPD - Digital Queue Management System",
-  description: "Lightweight web-based queue management for Tier-2/3 city hospitals. Real-time patient queue tracking with zero hardware requirements.",
+  description:
+    "Lightweight web-based queue management for Tier-2/3 city hospitals. Real-time patient queue tracking with zero hardware requirements.",
 };
 
 export default function RootLayout({

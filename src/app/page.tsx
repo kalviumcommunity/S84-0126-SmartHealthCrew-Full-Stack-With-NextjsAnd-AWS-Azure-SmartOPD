@@ -17,9 +17,24 @@ export default function Home() {
               </div>
             </div>
             <div className="hidden md:flex items-center gap-6">
-              <Link href="/about" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">About</Link>
-              <Link href="/live-queue" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Live Queue</Link>
-              <Link href="/news" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Updates</Link>
+              <Link
+                href="/about"
+                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+              >
+                About
+              </Link>
+              <Link
+                href="/live-queue"
+                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+              >
+                Live Queue
+              </Link>
+              <Link
+                href="/news"
+                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+              >
+                Updates
+              </Link>
             </div>
           </div>
         </nav>
@@ -33,11 +48,15 @@ export default function Home() {
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             End Long Hospital
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"> Waiting Queues</span>
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              {" "}
+              Waiting Queues
+            </span>
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Lightweight web-based digital queue management for Tier-2/3 city hospitals.
-            No hardware. No expensive software. Just efficient queue management.
+            Lightweight web-based digital queue management for Tier-2/3 city
+            hospitals. No hardware. No expensive software. Just efficient queue
+            management.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -66,11 +85,16 @@ export default function Home() {
                 <span className="text-2xl">⚡</span>
               </div>
               <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-xl font-bold text-gray-900">Static Rendering</h3>
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">SSG</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Static Rendering
+                </h3>
+                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">
+                  SSG
+                </span>
               </div>
               <p className="text-gray-600 mb-4 text-sm">
-                Pre-rendered at build time. Lightning fast, perfect for content that doesn't change often.
+                Pre-rendered at build time. Lightning fast, perfect for content
+                that doesn&apos;t change often.
               </p>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-gray-500">
@@ -92,11 +116,16 @@ export default function Home() {
                 <span className="text-2xl">🔄</span>
               </div>
               <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-xl font-bold text-gray-900">Dynamic Rendering</h3>
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">SSR</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Dynamic Rendering
+                </h3>
+                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">
+                  SSR
+                </span>
               </div>
               <p className="text-gray-600 mb-4 text-sm">
-                Generated on every request. Always fresh, ideal for real-time data like queue status.
+                Generated on every request. Always fresh, ideal for real-time
+                data like queue status.
               </p>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-gray-500">
@@ -118,11 +147,16 @@ export default function Home() {
                 <span className="text-2xl">🔀</span>
               </div>
               <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-xl font-bold text-gray-900">Hybrid Rendering</h3>
-                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">ISR</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Hybrid Rendering
+                </h3>
+                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">
+                  ISR
+                </span>
               </div>
               <p className="text-gray-600 mb-4 text-sm">
-                Static with periodic updates. Best of both worlds - fast and fresh.
+                Static with periodic updates. Best of both worlds - fast and
+                fresh.
               </p>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-gray-500">
@@ -140,22 +174,32 @@ export default function Home() {
 
         {/* Stats Section */}
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Why SmartOPD Works</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+            Why SmartOPD Works
+          </h2>
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">0</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                0
+              </div>
               <p className="text-gray-600 text-sm">Hardware Required</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">&lt;200ms</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                &lt;200ms
+              </div>
               <p className="text-gray-600 text-sm">Real-time Updates</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">100%</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                100%
+              </div>
               <p className="text-gray-600 text-sm">Cloud-Based</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">∞</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                ∞
+              </div>
               <p className="text-gray-600 text-sm">Scalable</p>
             </div>
           </div>
@@ -165,8 +209,12 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-400 mb-2">SmartOPD - Digital Queue Management System</p>
-          <p className="text-gray-500 text-sm">Built with Next.js, TypeScript, and modern web technologies</p>
+          <p className="text-gray-400 mb-2">
+            SmartOPD - Digital Queue Management System
+          </p>
+          <p className="text-gray-500 text-sm">
+            Built with Next.js, TypeScript, and modern web technologies
+          </p>
         </div>
       </footer>
     </div>

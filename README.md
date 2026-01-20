@@ -310,6 +310,33 @@ This project demonstrates understanding of:
 
 ---
 
+## 🔧 Code Quality Setup (Strict TS + ESLint + Prettier + Husky)
+
+### 🔹 Why Strict TypeScript?
+Strict mode catches:
+- Undefined types
+- Unused variables
+- Unused parameters
+- Implicit any errors
+
+This reduces runtime bugs and improves long-term maintainability.
+
+### 🔹 Why ESLint + Prettier?
+ESLint enforces code correctness (no console logs, semicolons, double quotes).  
+Prettier ensures consistent formatting across the entire team.
+
+### 🔹 Why Pre-Commit Hooks (Husky)?
+Husky + lint-staged run ESLint and Prettier BEFORE every commit.  
+This means:
+- No team member can push broken code  
+- Code formatting stays consistent  
+- Quality is enforced automatically
+
+### Result
+We now have a clean, consistent, professional codebase that enforces quality at every commit.
+
+---
+
 ## 🎥 Video Demo
 
 [Link to video walkthrough showing all three rendering modes in action]
