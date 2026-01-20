@@ -337,58 +337,6 @@ We now have a clean, consistent, professional codebase that enforces quality at 
 
 ---
 
-## 🎥 Video Demo
-
-[Link to video walkthrough showing all three rendering modes in action]
-
-**Video covers:**
-- Live demonstration of each page
-- Explanation of rendering strategies
-- DevTools Network tab showing caching behavior
-- Trade-offs discussion
-- Scalability considerations
-
----
-
-## 🤝 Contributing
-
-This is an academic project. For the assignment submission:
-
-**Branch Strategy:**
-```bash
-# Pull latest from main
-git checkout main
-git pull origin main
-
-# Create feature branch
-git checkout -b feat/rendering-modes
-
-# Make changes and commit
-git add .
-git commit -m "feat: implemented SSG, SSR, and ISR rendering modes"
-
-# Push and create PR
-git push origin feat/rendering-modes
-```
-
----
-
-## 📝 Assignment Reflection
-
-**Key Insights:**
-
-1. **No One-Size-Fits-All:** Different pages need different rendering strategies
-2. **Think Like a Performance Engineer:** Consider speed, freshness, and cost triangle
-3. **ISR is Underrated:** Perfect for 80% of use cases that fall between static and dynamic
-4. **Real-world Trade-offs:** Every architectural decision has trade-offs
-5. **Scalability Matters:** What works at 100 users might fail at 10,000
-
-**What would change at 10x scale?**
-- Static pages: No change (already optimal)
-- Dynamic pages: Add caching, consider WebSockets
-- Hybrid pages: Already optimized for scale
-
----
 
 ## 📚 Resources
 
