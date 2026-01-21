@@ -232,6 +232,50 @@ cd SmartOPD
 npm install
 ```
 
+### Environment Variables Setup
+
+SmartOPD uses environment variables to manage configuration securely. Follow these steps:
+
+1. **Copy the example environment file:**
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. **Fill in real values in `.env.local`:**
+   ```bash
+   # === SERVER ONLY VARIABLES ===
+   DATABASE_URL=postgres://user:password@localhost:5432/smartopd
+   REDIS_URL=redis://localhost:6379
+   JWT_SECRET=your-secret-key
+
+   # === CLIENT SAFE VARIABLES ===
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
+   ```
+
+3. **⚠️ IMPORTANT: Never commit `.env.local` to Git**  
+   This file contains real secrets and is already in `.gitignore`.
+
+4. **Environment Variables Reference:**
+
+   | Variable | Type | Description |
+   |----------|------|-------------|
+   | `DATABASE_URL` | Server-only | PostgreSQL connection string |
+   | `REDIS_URL` | Server-only | Redis connection string for caching |
+   | `JWT_SECRET` | Server-only | Secret key for JWT token generation |
+   | `NEXT_PUBLIC_API_BASE_URL` | Client-safe | API base URL (accessible in browser) |
+
+   **Usage in Code:**
+   ```tsx
+   // ✅ Server-side usage (API routes, server components)
+   const dbUrl = process.env.DATABASE_URL;
+   
+   // ✅ Client-side usage (only NEXT_PUBLIC_ variables)
+   const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+   
+   // ❌ WRONG: Server variables in client code
+   console.log(process.env.DATABASE_URL); // Won't work in browser
+   ```
+
 ### Running the Development Server
 
 ```bash
