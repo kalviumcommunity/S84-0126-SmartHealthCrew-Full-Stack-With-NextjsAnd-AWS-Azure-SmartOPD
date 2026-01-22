@@ -1,222 +1,290 @@
+"use client";
 import Link from "next/link";
+import { SEED_DOCTORS } from "../lib/constants";
+import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Navigation Header */}
-      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                S
+    <div className="flex flex-col bg-white">
+      {/* Hero Section */}
+      <section className="relative px-20 pt-20 pb-32 medical-gradient">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="max-w-xl">
+            <h1 className="text-6xl font-extrabold text-slate-900 leading-[1.1] mb-8">
+              Your <span className="text-sky-500">Health</span>, Our Happiness
+            </h1>
+            <p className="text-slate-500 text-lg leading-relaxed mb-10 pr-10">
+              In the new normal era like now, your health is very important.
+              Stay home, track your turn digitally, and visit only when
+              it&apos;s your turn.
+            </p>
+            <div className="flex items-center gap-6">
+              <Link href="/patient" className="btn-primary py-4 px-10 text-lg">
+                Get Appointment
+              </Link>
+            </div>
+
+            <div className="mt-16 flex items-center gap-8">
+              <div className="flex -space-x-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden"
+                  >
+                    <div className="w-full h-full bg-slate-300 flex items-center justify-center text-xs">
+                      👤
+                    </div>
+                  </div>
+                ))}
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">SmartOPD</h1>
-                <p className="text-xs text-gray-500">Digital Queue System</p>
+                <p className="font-bold text-slate-900">4,500+</p>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                  Patients Served Daily
+                </p>
               </div>
             </div>
-            <div className="hidden md:flex items-center gap-6">
-              <Link
-                href="/about"
-                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/live-queue"
-                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-              >
-                Live Queue
-              </Link>
-              <Link
-                href="/news"
-                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-              >
-                Updates
-              </Link>
-            </div>
           </div>
-        </nav>
-      </header>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold mb-6">
-            Next.js Rendering Strategies Demo
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            End Long Hospital
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              {" "}
-              Waiting Queues
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Lightweight web-based digital queue management for Tier-2/3 city
-            hospitals. No hardware. No expensive software. Just efficient queue
-            management.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/live-queue"
-              className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
-            >
-              View Live Queue →
-            </Link>
-            <Link
-              href="/about"
-              className="px-8 py-4 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-50 transition-colors border-2 border-gray-200"
-            >
-              Learn More
-            </Link>
+          <div className="relative w-1/2 flex justify-end">
+            <div className="relative z-10 w-125 h-150 rounded-[100px] bg-slate-100 shadow-2xl overflow-hidden border-8 border-white">
+              {/* Visual Placeholder for Doctor as in Reference */}
+              <div className="w-125 h-150 bg-sky-100 flex text-[25rem] opacity-80">
+                <Image
+                  src="/doctor1.jpg"
+                  alt="Doctor"
+                  width={600}
+                  height={500}
+                  className="rounded-3xl"
+                />
+              </div>
+            </div>
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-sky-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+            <div className="absolute top-20 -left-20 bg-white p-6 rounded-3xl shadow-2xl z-20 flex items-center gap-4">
+              <div className="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center text-white">
+                ✓
+              </div>
+              <div>
+                <p className="font-extrabold text-slate-800">Consultation</p>
+                <p className="text-xs text-slate-400">Available 24/7</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Rendering Strategy Cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid md:grid-cols-3 gap-8 mb-20">
-          {/* SSG Card */}
-          <Link href="/about" className="group">
-            <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all border border-gray-100 h-full">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-2xl">⚡</span>
-              </div>
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Static Rendering
-                </h3>
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">
-                  SSG
-                </span>
-              </div>
-              <p className="text-gray-600 mb-4 text-sm">
-                Pre-rendered at build time. Lightning fast, perfect for content
-                that doesn&apos;t change often.
-              </p>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-gray-500">
-                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                  <span>Instant page loads</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-500">
-                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                  <span>Minimal server cost</span>
-                </div>
-              </div>
-            </div>
-          </Link>
-
-          {/* SSR Card */}
-          <Link href="/live-queue" className="group">
-            <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all border border-gray-100 h-full">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-2xl">🔄</span>
-              </div>
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Dynamic Rendering
-                </h3>
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded">
-                  SSR
-                </span>
-              </div>
-              <p className="text-gray-600 mb-4 text-sm">
-                Generated on every request. Always fresh, ideal for real-time
-                data like queue status.
-              </p>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-gray-500">
-                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                  <span>Real-time accuracy</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-500">
-                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                  <span>Always fresh data</span>
-                </div>
-              </div>
-            </div>
-          </Link>
-
-          {/* ISR Card */}
-          <Link href="/news" className="group">
-            <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all border border-gray-100 h-full">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-2xl">🔀</span>
-              </div>
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Hybrid Rendering
-                </h3>
-                <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded">
-                  ISR
-                </span>
-              </div>
-              <p className="text-gray-600 mb-4 text-sm">
-                Static with periodic updates. Best of both worlds - fast and
-                fresh.
-              </p>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-gray-500">
-                  <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
-                  <span>Balanced performance</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-500">
-                  <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
-                  <span>Auto-regenerates</span>
-                </div>
-              </div>
-            </div>
-          </Link>
-        </div>
-
-        {/* Stats Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-            Why SmartOPD Works
+      {/* Our Services */}
+      <section className="py-32 px-20">
+        <div className="max-w-7xl mx-auto text-center mb-20">
+          <span className="section-label">Our Services</span>
+          <h2 className="text-4xl font-black text-slate-900">
+            Medical Services We Provide
           </h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                0
+        </div>
+
+        <div className="max-w-7xl mx-auto grid grid-cols-4 gap-8">
+          {[
+            {
+              icon: "💬",
+              title: "Consultation",
+              desc: "Get quick guidance from our specialized doctors.",
+              color: "bg-teal-500",
+            },
+            {
+              icon: "🩺",
+              title: "Doctors",
+              desc: "Hundreds of doctors with specific general expertise.",
+              color: "bg-sky-500",
+            },
+            {
+              icon: "🏥",
+              title: "Hospital",
+              desc: "Digital tokenization to manage facility crowds.",
+              color: "bg-orange-500",
+            },
+            {
+              icon: "💊",
+              title: "Pharmacy",
+              desc: "Track your prescription status in real-time.",
+              color: "bg-purple-500",
+            },
+          ].map((s, i) => (
+            <div
+              key={i}
+              className="sleek-card p-10 flex flex-col items-start group"
+            >
+              <div
+                className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center text-2xl text-white mb-8 group-hover:scale-110 transition-transform`}
+              >
+                {s.icon}
               </div>
-              <p className="text-gray-600 text-sm">Hardware Required</p>
+              <h3 className="text-xl font-bold text-slate-800 mb-4">
+                {s.title}
+              </h3>
+              <p className="text-slate-500 text-sm leading-relaxed">{s.desc}</p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                &lt;200ms
+          ))}
+        </div>
+      </section>
+
+      {/* About Us Split */}
+      <section className="py-32 px-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto flex items-center gap-24">
+          <div className="w-1/2">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="w-full h-80 rounded-[40px] bg-white p-4 shadow-sm">
+                <div className="w-full h-full bg-slate-100 rounded-[30px] flex items-center justify-center text-8xl">
+                  👩‍⚕️
+                </div>
               </div>
-              <p className="text-gray-600 text-sm">Real-time Updates</p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                100%
+              <div className="w-full h-80 rounded-[40px] bg-white p-4 shadow-sm mt-12">
+                <div className="w-full h-full bg-slate-100 rounded-[30px] flex items-center justify-center text-8xl">
+                  🏥
+                </div>
               </div>
-              <p className="text-gray-600 text-sm">Cloud-Based</p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                ∞
-              </div>
-              <p className="text-gray-600 text-sm">Scalable</p>
-            </div>
+          </div>
+          <div className="w-1/2">
+            <span className="section-label">About Us</span>
+            <h2 className="text-5xl font-extrabold text-slate-900 mb-8 leading-tight">
+              We Provide The Best Quality Service For You
+            </h2>
+            <p className="text-slate-500 leading-relaxed mb-10">
+              SmartOPD is a digital health platform providing services to the
+              health sector. You can register your arrival, find a doctor
+              according to your ailment, and get real-time updates on your turn
+              without physical waiting.
+            </p>
+            <button className="btn-primary">Learn More</button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-400 mb-2">
-            SmartOPD - Digital Queue Management System
-          </p>
-          <p className="text-gray-500 text-sm">
-            Built with Next.js, TypeScript, and modern web technologies
-          </p>
+      {/* Our Doctors */}
+      <section className="py-32 px-20">
+        <div className="max-w-7xl mx-auto text-center mb-20">
+          <span className="section-label">Our Doctors</span>
+          <h2 className="text-4xl font-black text-slate-900">
+            Highly Specialized Professionals
+          </h2>
         </div>
-      </footer>
+
+        <div className="max-w-7xl mx-auto grid grid-cols-3 gap-12">
+          {SEED_DOCTORS.map((doc, i) => (
+            <div key={i} className="text-center group">
+              <div className="doctor-image-container w-full aspect-4/5 mb-8 group-hover:shadow-2xl transition-all">
+                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-[10rem] grayscale group-hover:grayscale-0 transition-all">
+                  <Image
+                    src={doc.url}
+                    alt="Doctor"
+                    width={400}
+                    height={500}
+                    className="rounded-3xl"
+                  />
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-1">
+                {doc.name}
+              </h3>
+              <p className="text-sm font-bold text-sky-500 uppercase tracking-widest mb-4">
+                {doc.department}
+              </p>
+              <div className="flex justify-center gap-4">
+                {["fb", "tw", "ln"].map((s) => (
+                  <div
+                    key={s}
+                    className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 hover:text-sky-500 cursor-pointer"
+                  >
+                    {s}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-20 text-center">
+          <Link href="/patient" className="btn-outline px-12">
+            View All Doctors
+          </Link>
+        </div>
+      </section>
+
+      {/* News & Updates */}
+      <section className="py-32 px-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto text-center mb-20">
+          <span className="section-label">Latest News</span>
+          <h2 className="text-4xl font-black text-slate-900">
+            Get To Know More Medical Updates
+          </h2>
+        </div>
+
+        <div className="max-w-7xl mx-auto grid grid-cols-3 gap-8">
+          {[
+            {
+              tag: "Health",
+              title: "How to Maintain Health During Lockdown",
+              img: "🥬",
+            },
+            {
+              tag: "Disease",
+              title: "5 Foods That Contain High Protein for Kids",
+              img: "🍳",
+            },
+            {
+              tag: "Medical",
+              title: "Get To Know The Newest Type Of Vaccines",
+              img: "💉",
+            },
+          ].map((a, i) => (
+            <div key={i} className="sleek-card group overflow-hidden">
+              <div className="w-full h-64 bg-slate-200 flex items-center justify-center text-8xl group-hover:scale-105 transition-transform duration-500">
+                {a.img}
+              </div>
+              <div className="p-8">
+                <span className="text-[10px] font-black text-sky-500 uppercase tracking-widest mb-4 block">
+                  {a.tag}
+                </span>
+                <h3 className="text-xl font-bold text-slate-800 mb-6 leading-tight group-hover:text-sky-600 transition-colors">
+                  {a.title}
+                </h3>
+                <button className="text-sm font-bold text-slate-400 hover:text-sky-500">
+                  Read More →
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-32 px-20 bg-sky-500/5">
+        <div className="max-w-5xl mx-auto text-center">
+          <span className="section-label">Testimonials</span>
+          <h2 className="text-4xl font-black text-slate-900 mb-16">
+            What Our Patients Say
+          </h2>
+
+          <div className="bg-white p-16 rounded-[60px] shadow-2xl relative">
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-sky-500 rounded-full flex items-center justify-center text-white text-4xl shadow-xl">
+              &quot;
+            </div>
+            <p className="text-2xl font-medium text-slate-600 leading-relaxed mb-12 italic">
+              SmartOPD saved me hours of sitting in a crowded hospital. I could
+              stay at my home, watch my turn progress on my phone, and only left
+              when there were 2 people ahead. Brilliant infrastructure!
+            </p>
+            <div>
+              <div className="w-16 h-16 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl">
+                👤
+              </div>
+              <p className="font-bold text-slate-900">Arjun Sharma</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Patient since 2023
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
