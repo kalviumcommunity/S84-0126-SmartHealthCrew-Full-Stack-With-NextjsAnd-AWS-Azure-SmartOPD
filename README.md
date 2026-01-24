@@ -175,9 +175,9 @@ Each rendering mode gives you **two out of three** — choose wisely!
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **Runtime:** Node.js
+- **Database:** PostgreSQL with Prisma ORM
 
 ### Planned Architecture
-- **Database:** PostgreSQL with Prisma ORM
 - **Caching:** Redis for real-time queue updates
 - **Containerization:** Docker
 - **Deployment:** AWS/Azure
@@ -185,10 +185,93 @@ Each rendering mode gives you **two out of three** — choose wisely!
 
 ---
 
+## 📦 Prisma ORM Setup
+
+### What We Implemented
+
+✅ **Installed Prisma ORM**
+- Installed `prisma` as dev dependency
+- Installed `@prisma/client` for database queries
+
+✅ **Created Database Schema**
+- Defined `Patient` model (id, name, phone, token, status, createdAt)
+- Defined `Admin` model (id, username, password)
+- Configured PostgreSQL as database provider
+
+✅ **Generated Prisma Client**
+- Auto-generated type-safe query builder
+- Includes all CRUD operations for Patient & Admin models
+
+✅ **Connected to PostgreSQL**
+- Set up `DATABASE_URL` in environment variables
+- Configured connection through `prisma.config.ts`
+
+✅ **Created Reusable Prisma Instance**
+- Built singleton pattern in `src/lib/prisma.ts`
+- Prevents multiple database connections during dev hot reload
+- Includes query logging for debugging
+
+### Why Prisma?
+
+- **Type Safety** - Auto-generated TypeScript types prevent runtime errors
+- **Developer Experience** - Intuitive API, IntelliSense support, auto-completion
+- **Prevents SQL Injection** - Parameterized queries by default
+- **Easy Migrations** - Database schema versioning and migration management
+- **Built for Next.js** - Perfect integration with API routes and server components
+- **Auto-Generated Queries** - No need to write raw SQL
+
+### Project Structure After Prisma Setup
+
+```
+SmartOPD/
+├── prisma/
+│   ├── schema.prisma          # Database schema definition
+│   └── migrations/            # Database migrations (future)
+├── prisma.config.ts           # Prisma configuration
+├── src/
+│   ├── lib/
+│   │   └── prisma.ts          # Reusable Prisma client instance
+│   ├── app/
+│   │   └── test-prisma/
+│   │       └── page.tsx       # Test page for Prisma connection
+└── .env                       # Database connection string
+```
+
+### Usage Example
+
+```typescript
+import { prisma } from "@/lib/prisma";
+
+// Get all patients
+const patients = await prisma.patient.findMany();
+
+// Create a new patient
+const newPatient = await prisma.patient.create({
+  data: {
+    name: "John Doe",
+    phone: "1234567890",
+    token: 101,
+    status: "waiting"
+  }
+});
+
+// Update patient status
+const updated = await prisma.patient.update({
+  where: { id: 1 },
+  data: { status: "completed" }
+});
+```
+
+---
+
 ## 📁 Project Structure
 
 ```
 SmartOPD/
+├── prisma/
+│   ├── schema.prisma             # Prisma database schema
+│   └── migrations/               # Database migrations (future)
+├── prisma.config.ts              # Prisma configuration
 ├── src/
 │   ├── app/
 │   │   ├── page.tsx              # Home page
@@ -198,13 +281,20 @@ SmartOPD/
 │   │   │   └── page.tsx          # Live Queue Status (SSR)
 │   │   ├── news/
 │   │   │   └── page.tsx          # SmartOPD Updates (ISR)
+│   │   ├── test-prisma/
+│   │   │   └── page.tsx          # Prisma connection test
 │   │   ├── layout.tsx            # Root layout
 │   │   └── globals.css           # Global styles
 │   │
 │   ├── components/               # Reusable UI components (future)
-│   └── lib/                      # Utilities and helpers (future)
+│   └── lib/
+│       ├── prisma.ts             # Prisma client instance
+│       ├── constants.ts          # Constants
+│       └── types.ts              # TypeScript types
 │
 ├── public/                       # Static assets
+├── .env                          # Environment variables (database URL)
+├── .env.example                  # Example environment variables
 ├── .gitignore
 ├── package.json
 ├── tsconfig.json
