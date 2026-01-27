@@ -7,8 +7,9 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    seed: "npx tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: "postgresql://neondb_owner:npg_S4ka2JemvPCx@ep-plain-boat-ah34ezh4-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
   },
 });

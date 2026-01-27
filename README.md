@@ -444,7 +444,48 @@ This project demonstrates understanding of:
 
 ---
 
-## 🔧 Code Quality Setup (Strict TS + ESLint + Prettier + Husky)
+## �️ Database & Migrations
+
+SmartOPD uses **Prisma** as its ORM and **PostgreSQL** (hosted on Neon) as its database.
+
+### 🔄 Migrations
+
+We follow a structured migration process to ensure database consistency.
+
+- **Initial Migration:** `20260127053924_add_auth_system`
+- **First Schema Setup:** Managed via `npx prisma migrate dev --name init_schema`
+
+Commands:
+- `npx prisma migrate dev`: Run migrations in development
+- `npx prisma migrate deploy`: Apply pending migrations in production
+- `npx prisma studio`: Open UI to view and edit data
+
+### 🌿 Seeding
+
+To quickly set up the local environment, run the seeding script to create a default admin user.
+
+**Command:**
+```bash
+npx prisma db seed
+```
+
+**What it does:**
+- Creates a default admin: `admin@example.com` / `admin123`
+- Uses `upsert` to ensure idempotency (no duplicate entries)
+- Hashes passwords using `bcrypt` for production safety
+
+---
+
+## 🛠️ Production Safety & Best Practices
+
+- **Migrations Matter:** We avoid `prisma db push` in production to maintain a clear history of schema changes.
+- **Environment Isolation:** `DATABASE_URL` is managed via `.env` and secret management.
+- **Security:** Admin passwords are NEVER stored in plain text.
+- **Idempotent Seeding:** Scripts can be run multiple times without corrupting data.
+
+---
+
+## �🔧 Code Quality Setup (Strict TS + ESLint + Prettier + Husky)
 
 ### 🔹 Why Strict TypeScript?
 Strict mode catches:
