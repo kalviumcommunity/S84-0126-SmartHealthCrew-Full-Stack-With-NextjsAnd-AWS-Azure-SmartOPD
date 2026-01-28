@@ -537,3 +537,103 @@ This project is for educational purposes as part of an academic assignment.
 ---
 
 **Built with ❤️ using Next.js, TypeScript, and modern web technologies**
+
+---
+
+## 🛠️ Data Modeling & PostgreSQL Schema
+
+### 📊 ER Diagram
+
+```mermaid
+erDiagram
+    Patient ||--o{ QueueToken : "has"
+    Patient {
+        Int id PK
+        String name
+        String phone
+        Int token UK
+        String status
+        DateTime createdAt
+    }
+    Admin {
+        Int id PK
+        String email UK
+        String password
+        DateTime createdAt
+    }
+    QueueToken {
+        Int id PK
+        Int token
+        String status
+        DateTime createdAt
+        Int patientId FK
+    }
+```
+
+### 📝 Schema Explanation
+
+The database consists of three core models designed for efficiency and scalability:
+
+1.  **Patient**: Represents a user who joins the queue.
+    *   `id`: Primary Key.
+    *   `token`: Unique queue number assigned to the patient.
+    *   `status`: Current state (waiting, completed).
+
+2.  **Admin**: Hospital staff who manages the queue.
+    *   `email`: Unique identifier for login.
+    *   `password`: Hashed password for security.
+
+3.  **QueueToken**: Stores historical queue data (optional but added for scalability).
+    *   `patientId`: Foreign Key linking to Patient.
+
+### 🔑 Keys & Constraints
+
+*   **Primary Keys (`@id`)**: `id` fields in all tables are auto-incrementing integers.
+*   **Unique Keys (`@unique`)**:
+    *   `Patient.token`: Ensures no two active patients have the same token.
+    *   `Admin.email`: Prevents duplicate admin accounts.
+*   **Foreign Keys (`@relation`)**:
+    *   `QueueToken.patientId` references `Patient.id`.
+*   **Default Values (`@default`)**:
+    *   `status`: Defaults to "waiting".
+    *   `createdAt`: Defaults to `now()`.
+
+### 📐 Normalization
+
+*   **1NF (First Normal Form)**: Atomic values (no repeating groups or arrays in columns).
+*   **2NF (Second Normal Form)**: All non-key attributes depend on the primary key.
+*   **3NF (Third Normal Form)**: No transitive dependencies; attributes depend only on the primary key.
+
+### ⚡ Migration Commands
+
+```bash
+# 1. Initialize Migration
+npx prisma migrate dev --name init_schema
+
+# 2. Seed Database
+npx prisma db seed
+
+# 3. Verify in Studio
+npx prisma studio
+```
+
+### 🌱 Seed Data Explanation
+
+The `prisma/seed.ts` script populates the database with initial test data:
+*   **Admin**: Creates a default admin `admin@example.com` with password `admin123` (hashed using bcrypt).
+*   **Patients**: Inserts sample patients (Amit, Sita) with tokens 1 and 2.
+
+### 📸 Data Verification
+
+*(Add Screenshot of Patient Table in Prisma Studio Here)*
+
+*(Add Screenshot of Admin Table in Prisma Studio Here)*
+
+### 🧠 Reflection: Scalability
+
+**Question:** If SmartOPD must support 10x more data, does the design support it?
+
+**Response:** Yes, the design supports scalability because:
+1.  **Indexing**: critical fields like `token` and `email` are unique and indexed, ensuring fast lookups even as data grows.
+2.  **History Separation**: The `QueueToken` table is designed to decouple active queue status from historical logs, preventing the main `Patient` table from becoming bloated over time.
+3.  **Normalization**: The schema is normalized to avoid data redundancy, saving storage and maintaining consistency.
