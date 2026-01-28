@@ -1,36 +1,26 @@
-import "dotenv/config";
-import { PrismaClient } from "../src/generated/prisma/client";
-import { Pool, neonConfig } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import ws from "ws";
-import bcrypt from "bcrypt";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
-neonConfig.webSocketConstructor = ws;
-
-const connectionString =
-  process.env.DATABASE_URL ||
-  "postgresql://neondb_owner:npg_S4ka2JemvPCx@ep-plain-boat-ah34ezh4-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
-
-console.log(
-  "Seed using connection string starting with:",
-  connectionString.substring(0, 15)
-);
-
-const pool = new Pool({ connectionString });
-const adapter = new PrismaNeon(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.admin.upsert({
-    where: { email: "admin@example.com" },
-    update: {},
-    create: {
+  // Seed admin
+  await prisma.admin.create({
+    data: {
       email: "admin@example.com",
       password: await bcrypt.hash("admin123", 10),
     },
   });
 
-  console.log("Admin seeded successfully!");
+  // Seed patients
+  await prisma.patient.createMany({
+    data: [
+      { name: "Amit", phone: "9876543210", token: 1 },
+      { name: "Sita", phone: "9123456780", token: 2 },
+    ],
+  });
+
+  console.log("Seed data inserted successfully!");
 }
 
 main()

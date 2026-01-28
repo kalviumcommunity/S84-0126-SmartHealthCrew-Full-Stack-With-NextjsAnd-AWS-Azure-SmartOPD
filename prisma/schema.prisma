@@ -1,22 +1,20 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 datasource db {
   provider = "postgresql"
 }
 
 generator client {
-   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 model Patient {
   id        Int      @id @default(autoincrement())
   name      String
   phone     String
-  token     Int
+  token     Int      @unique
   status    String   @default("waiting")
   createdAt DateTime @default(now())
+
+  queueTokens QueueToken[]
 }
 
 model Admin {
@@ -24,4 +22,14 @@ model Admin {
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+}
+
+model QueueToken {
+  id        Int      @id @default(autoincrement())
+  token     Int
+  status    String    @default("waiting")
+  createdAt DateTime @default(now())
+
+  patientId Int
+  patient   Patient   @relation(fields: [patientId], references: [id])
 }
