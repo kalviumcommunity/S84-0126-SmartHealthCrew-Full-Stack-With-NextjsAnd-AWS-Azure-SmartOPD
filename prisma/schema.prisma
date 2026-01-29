@@ -15,6 +15,9 @@ model Patient {
   createdAt DateTime @default(now())
 
   queueTokens QueueToken[]
+
+  @@index([token])
+  @@index([phone])
 }
 
 model Admin {
@@ -22,6 +25,8 @@ model Admin {
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 model QueueToken {
@@ -32,4 +37,7 @@ model QueueToken {
 
   patientId Int
   patient   Patient   @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@index([token])
 }
