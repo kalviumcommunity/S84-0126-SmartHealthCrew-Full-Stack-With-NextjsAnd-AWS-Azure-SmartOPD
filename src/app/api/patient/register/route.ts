@@ -1,75 +1,47 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { name, phone } = body;
+    const { name, phone } = await req.json();
 
-    // Validation
-    if (!name || !phone) {
-      return NextResponse.json(
-        { success: false, message: "Name and phone are required" },
-        { status: 400 }
-      );
-    }
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Get last token
+      const last = await tx.patient.findFirst({
+        orderBy: { token: "desc" },
+        select: { token: true },
+      });
 
-    // Validate phone format (basic validation for 10 digits)
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(phone)) {
-      return NextResponse.json(
-        { success: false, message: "Phone number must be 10 digits" },
-        { status: 400 }
-      );
-    }
+      const newToken = (last?.token ?? 0) + 1;
 
-    // Validate name length
-    if (name.trim().length < 2) {
-      return NextResponse.json(
-        { success: false, message: "Name must be at least 2 characters" },
-        { status: 400 }
-      );
-    }
-
-    // Find the last patient token
-    const lastPatient = await prisma.patient.findFirst({
-      orderBy: {
-        token: "desc",
-      },
-    });
-
-    // Generate new token (last token + 1, or start at 1)
-    const newToken = lastPatient ? lastPatient.token + 1 : 1;
-
-    // Create patient
-    const patient = await prisma.patient.create({
-      data: {
-        name: name.trim(),
-        phone,
-        token: newToken,
-        status: "waiting",
-      },
-    });
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Patient registered successfully",
-        token: patient.token,
-        patient: {
-          id: patient.id,
-          name: patient.name,
-          phone: patient.phone,
-          token: patient.token,
-          status: patient.status,
+      // 2. Create patient
+      const patient = await tx.patient.create({
+        data: {
+          name,
+          phone,
+          token: newToken,
         },
-      },
-      { status: 201 }
-    );
+      });
+
+      // 3. Create token entry
+      await tx.queueToken.create({
+        data: {
+          token: newToken,
+          patientId: patient.id,
+        },
+      });
+
+      return { patient, token: newToken };
+    });
+
+    return Response.json({
+      success: true,
+      token: result.token,
+      message: "Token generated successfully",
+    });
   } catch (error) {
-    console.error("Patient registration error:", error);
-    return NextResponse.json(
-      { success: false, message: "Internal server error" },
+    console.error("Transaction failed:", error);
+    return Response.json(
+      { success: false, message: "Registration failed" },
       { status: 500 }
     );
   }
