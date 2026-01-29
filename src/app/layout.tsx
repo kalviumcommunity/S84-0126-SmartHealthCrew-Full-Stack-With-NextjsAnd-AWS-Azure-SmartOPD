@@ -52,7 +52,7 @@ const Header: React.FC = () => {
           Live Status
         </Link>
         <Link href="/doctor/login" className="btn-primary py-2.5 px-8">
-          Get Started
+          Staff Login
         </Link>
       </nav>
     </header>
