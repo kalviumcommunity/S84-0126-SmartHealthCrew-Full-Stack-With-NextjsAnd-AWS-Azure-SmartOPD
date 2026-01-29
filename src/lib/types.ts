@@ -1,5 +1,3 @@
-import { Url } from "next/dist/shared/lib/router/router";
-
 export enum TokenStatus {
   WAITING = "waiting",
   SERVING = "serving",
@@ -15,7 +13,7 @@ export enum QueueStatus {
 export interface Doctor {
   id: string;
   name: string;
-  url: Url;
+  url: string;
   department: string;
   email: string;
   queueStatus: QueueStatus;

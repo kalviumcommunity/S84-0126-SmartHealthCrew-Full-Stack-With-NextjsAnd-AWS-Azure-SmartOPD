@@ -38,9 +38,9 @@ export default function Home() {
                 ))}
               </div>
               <div>
-                <p className="font-bold text-slate-900">4,500+</p>
+                <p className="font-bold text-slate-900"></p>
                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-                  Patients Served Daily
+                  Currently in development phase
                 </p>
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function Home() {
               </div>
               <p className="font-bold text-slate-900">Arjun Sharma</p>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                Patient since 2023
+                Patient since 2026
               </p>
             </div>
           </div>

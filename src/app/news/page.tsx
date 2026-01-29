@@ -110,39 +110,43 @@ export default async function News() {
             Recent Updates
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {data.posts
-              .slice(0, 6)
-              .map(
-                (
-                  post: { id: number; title: string; body: string },
-                  index: number
-                ) => (
-                  <div
-                    key={post.id}
-                    className={`bg-white rounded-2xl p-6 shadow-md border transition-all hover:shadow-xl ${
-                      index === 0
-                        ? "border-purple-200 bg-gradient-to-br from-purple-50 to-white"
-                        : "border-gray-100"
-                    }`}
-                  >
-                    {index === 0 && (
-                      <span className="inline-block bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
-                        Latest
-                      </span>
-                    )}
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                      {post.body}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>👤 User {post.userId}</span>
-                      <span>❤️ {post.reactions?.likes || 0} reactions</span>
-                    </div>
+            {data.posts.slice(0, 6).map(
+              (
+                post: {
+                  id: number;
+                  title: string;
+                  body: string;
+                  userId: number;
+                  reactions: { likes: number; dislikes: number };
+                },
+                index: number
+              ) => (
+                <div
+                  key={post.id}
+                  className={`bg-white rounded-2xl p-6 shadow-md border transition-all hover:shadow-xl ${
+                    index === 0
+                      ? "border-purple-200 bg-gradient-to-br from-purple-50 to-white"
+                      : "border-gray-100"
+                  }`}
+                >
+                  {index === 0 && (
+                    <span className="inline-block bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                      Latest
+                    </span>
+                  )}
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                    {post.body}
+                  </p>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>👤 User {post.userId}</span>
+                    <span>❤️ {post.reactions?.likes || 0} reactions</span>
                   </div>
-                )
-              )}
+                </div>
+              )
+            )}
           </div>
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
