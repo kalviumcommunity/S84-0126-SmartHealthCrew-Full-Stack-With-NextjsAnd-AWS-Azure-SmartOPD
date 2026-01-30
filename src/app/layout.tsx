@@ -43,7 +43,7 @@ const Header: React.FC = () => {
           href="/news"
           className="text-sm font-semibold text-slate-500 hover:text-sky-500 transition-colors"
         >
-          Services
+          News
         </Link>
         <Link
           href="/live-queue"
