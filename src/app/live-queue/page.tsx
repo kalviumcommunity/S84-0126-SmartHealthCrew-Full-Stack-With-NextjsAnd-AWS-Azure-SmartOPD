@@ -1,278 +1,185 @@
+/* eslint-disable prettier/prettier */
+"use client";
+
+import { useState, useEffect } from "react";
+import { TokenStatus, AppState, QueueToken } from "@/lib/types";
+import { SEED_DOCTORS } from "@/lib/constants";
 import Link from "next/link";
 
-// DYNAMIC RENDERING (SSR) — Always fresh data
-export const dynamic = "force-dynamic";
+interface ApiPatient {
+  id: number;
+  name: string;
+  phone: string;
+  token: number;
+  status: string;
+  createdAt: string;
+}
 
-export default async function LiveQueue() {
-  const res = await fetch("https://dummyjson.com/posts/1", {
-    cache: "no-store",
+export default function LiveQueue() {
+  const [db, setDb] = useState<AppState>({
+    doctors: SEED_DOCTORS,
+    tokens: [],
   });
-  const data = await res.json();
-  const requestTime = new Date();
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [error, setError] = useState<string | null>(null);
 
-  // Simulate queue data (using timestamp-based values for SSR uniqueness)
-  const seed = requestTime.getSeconds();
-  const queueData = {
-    currentNumber: (seed % 50) + 1,
-    waitingPatients: (seed % 30) + 5,
-    avgWaitTime: (seed % 20) + 10,
-    doctorsAvailable: (seed % 3) + 2,
-  };
+  useEffect(() => {
+    const fetchQueueData = async () => {
+      try {
+        const res = await fetch("/api/admin/patients");
+
+        if (res.status === 401) {
+          setError("Unauthorized. This display requires Admin access.");
+          return;
+        }
+
+        if (!res.ok) throw new Error("Failed to fetch");
+
+        const data = await res.json();
+
+        if (data.success) {
+          setError(null);
+          const mappedTokens: QueueToken[] = data.patients.map(
+            (p: ApiPatient) => ({
+              id: String(p.id),
+              // Distribute patients to doctors using token number for stability
+              // Use token number to ensure consistent doctor assignment
+              doctorId: SEED_DOCTORS[p.token % SEED_DOCTORS.length].id,
+              tokenNumber: p.token,
+              patientName: p.name,
+              patientPhone: p.phone,
+              status: (p.status as TokenStatus) || TokenStatus.WAITING,
+              createdAt: p.createdAt
+                ? new Date(p.createdAt).getTime()
+                : Date.now(),
+            })
+          );
+
+          setDb({
+            doctors: SEED_DOCTORS,
+            tokens: mappedTokens,
+          });
+          setLastUpdated(new Date());
+        }
+      } catch (error) {
+        console.error("Error fetching live queue:", error);
+      }
+    };
+
+    // Initial fetch
+    fetchQueueData();
+
+    const interval = setInterval(fetchQueueData, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-xl border border-slate-100 max-w-md">
+          <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+            🔒
+          </div>
+          <h1 className="text-2xl font-black text-slate-800 mb-2">
+            Access Restricted
+          </h1>
+          <p className="text-slate-500 mb-6">{error}</p>
+          <Link
+            href="/doctor/login"
+            className="inline-flex items-center justify-center px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors w-full"
+          >
+            Login as Doctor/Admin
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Navigation */}
-      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link
-              href="/"
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-            >
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                S
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">SmartOPD</h1>
-                <p className="text-xs text-gray-500">Digital Queue System</p>
-              </div>
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link
-                href="/"
-                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                href="/about"
-                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/news"
-                className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
-              >
-                Updates
-              </Link>
-            </div>
+    <div className="bg-slate-50 min-h-screen py-16 px-12">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-end mb-16">
+          <div>
+            <span className="text-green-500 font-black text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              Live Broadcast
+            </span>
+            <h1 className="text-5xl font-black text-slate-900 tracking-tighter">
+              Current Serving Status
+            </h1>
           </div>
-        </nav>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-            Dynamic Rendering (SSR)
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Live Queue Status
-          </h1>
-          <p className="text-xl text-gray-600">
-            Real-time patient queue monitoring - Generated fresh on every
-            request
-          </p>
-        </div>
-
-        {/* Current Number Display */}
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl p-12 text-white text-center mb-8 shadow-2xl">
-          <p className="text-lg font-semibold mb-2 opacity-90">Now Serving</p>
-          <div className="text-7xl md:text-8xl font-bold mb-4">
-            {queueData.currentNumber}
-          </div>
-          <p className="text-blue-100">
-            Last updated: {requestTime.toLocaleTimeString()}
-          </p>
-        </div>
-
-        {/* Queue Metrics */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">👥</span>
-              </div>
-              <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded">
-                LIVE
-              </span>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">
-              {queueData.waitingPatients}
-            </div>
-            <p className="text-gray-600 text-sm">Patients Waiting</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">⏱️</span>
-              </div>
-              <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded">
-                AVG
-              </span>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">
-              {queueData.avgWaitTime} min
-            </div>
-            <p className="text-gray-600 text-sm">Average Wait Time</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">👩‍⚕️</span>
-              </div>
-              <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-1 rounded">
-                ACTIVE
-              </span>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">
-              {queueData.doctorsAvailable}
-            </div>
-            <p className="text-gray-600 text-sm">Doctors Available</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">🏋️</span>
-              </div>
-              <span className="text-xs font-semibold text-teal-600 bg-teal-100 px-2 py-1 rounded">
-                TODAY
-              </span>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">
-              {(requestTime.getMinutes() % 50) + 50}
-            </div>
-            <p className="text-gray-600 text-sm">Total Consultations</p>
-          </div>
-        </div>
-
-        {/* API Data Display */}
-        <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Live API Data
-          </h2>
-          <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-sm text-gray-600 mb-2">
-              Data fetched at request time:
+          <div className="text-right">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              Last Update
             </p>
-            <p className="text-lg font-semibold text-gray-900">{data.title}</p>
-          </div>
-        </div>
-
-        {/* Why SSR Section */}
-        <div className="bg-blue-50 rounded-2xl p-8 border border-blue-200 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Why This Page Uses Dynamic Rendering (SSR)
-          </h2>
-          <p className="text-gray-700 mb-4">
-            Queue data changes constantly and must be accurate for hospital
-            operations:
-          </p>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg p-4">
-              <div className="text-2xl mb-2">🔄</div>
-              <h3 className="font-semibold text-gray-900 mb-1">Always Fresh</h3>
-              <p className="text-sm text-gray-600">
-                Data fetched on every request
-              </p>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <div className="text-2xl mb-2">⏱️</div>
-              <h3 className="font-semibold text-gray-900 mb-1">Real-time</h3>
-              <p className="text-sm text-gray-600">
-                Critical for patient safety
-              </p>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <div className="text-2xl mb-2">🎯</div>
-              <h3 className="font-semibold text-gray-900 mb-1">Accurate</h3>
-              <p className="text-sm text-gray-600">No stale data ever served</p>
-            </div>
-          </div>
-          <div className="mt-6 bg-white rounded-lg p-4">
-            <p className="text-xs text-gray-500 mb-1">Request processed at:</p>
-            <code className="text-sm font-mono text-gray-700">
-              {requestTime.toISOString()}
-            </code>
-            <p className="text-xs text-gray-500 mt-2">
-              💡 Refresh the page - you&apos;ll see different numbers and a new
-              timestamp
+            <p className="font-bold text-slate-800">
+              {lastUpdated.toLocaleTimeString()}
             </p>
           </div>
         </div>
 
-        {/* Trade-offs */}
-        <div className="bg-yellow-50 rounded-2xl p-8 border border-yellow-200 mb-8">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">
-            ⚠️ Performance Trade-offs
-          </h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold text-green-800 mb-3">Advantages:</h4>
-              <ul className="space-y-2 text-sm text-green-700">
-                <li className="flex items-start gap-2">
-                  <span className="mt-1">✓</span>
-                  <span>Always shows current queue status</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1">✓</span>
-                  <span>Critical for hospital operations</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1">✓</span>
-                  <span>Patient safety depends on accuracy</span>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-red-800 mb-3">
-                Considerations:
-              </h4>
-              <ul className="space-y-2 text-sm text-red-700">
-                <li className="flex items-start gap-2">
-                  <span className="mt-1">•</span>
-                  <span>Slower than static pages (on-demand)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1">•</span>
-                  <span>Higher server costs at scale</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1">•</span>
-                  <span>Requires more infrastructure</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <div className="grid grid-cols-3 gap-10">
+          {db.doctors.map((doc) => {
+            const serving = db.tokens.find(
+              (t) => t.doctorId === doc.id && t.status === TokenStatus.SERVING
+            );
 
-        {/* Navigation Footer */}
-        <div className="flex flex-wrap gap-4">
-          <Link
-            href="/"
-            className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
-          >
-            ← Home
-          </Link>
-          <Link
-            href="/about"
-            className="px-6 py-3 bg-white text-gray-900 border-2 border-gray-200 rounded-lg hover:border-gray-300 transition-colors font-medium"
-          >
-            About (SSG)
-          </Link>
-          <Link
-            href="/news"
-            className="px-6 py-3 bg-white text-gray-900 border-2 border-gray-200 rounded-lg hover:border-gray-300 transition-colors font-medium"
-          >
-            Updates (ISR) →
-          </Link>
+            const waiting = db.tokens.filter(
+              (t) => t.doctorId === doc.id && t.status === TokenStatus.WAITING
+            ).length;
+
+            return (
+              <div
+                key={doc.id}
+                className="bg-white rounded-[50px] p-10 shadow-xl border border-slate-100 flex flex-col items-center text-center"
+              >
+                <div className="w-20 h-20 bg-blue-100 rounded-3xl flex items-center justify-center text-3xl mb-6 shadow-inner">
+                  🩺
+                </div>
+
+                <h3 className="text-xl font-black text-slate-800 mb-1">
+                  {doc.name}
+                </h3>
+                <p className="text-xs text-slate-400 font-black uppercase tracking-widest mb-10">
+                  {doc.department}
+                </p>
+
+                <div className="w-full bg-slate-50 rounded-[40px] p-8 mb-8">
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">
+                    Now Serving
+                  </p>
+                  <p className="text-8xl font-black text-blue-600 token-font">
+                    {serving?.tokenNumber || "--"}
+                  </p>
+                </div>
+
+                <div className="flex justify-between w-full px-4">
+                  <div>
+                    <p className="text-2xl font-black text-slate-800">
+                      {waiting}
+                    </p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      In Queue
+                    </p>
+                  </div>
+
+                  <div className="h-10 w-px bg-slate-100"></div>
+
+                  <div>
+                    <p className="text-2xl font-black text-slate-800">
+                      ~{waiting * doc.avgTimePerPatient}m
+                    </p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      Estimated Wait
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
