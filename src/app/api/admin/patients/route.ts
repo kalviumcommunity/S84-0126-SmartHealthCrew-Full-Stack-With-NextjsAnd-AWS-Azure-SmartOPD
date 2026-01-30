@@ -20,10 +20,18 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    // Calculate stats
+    const stats = {
+      total: patients.length,
+      waiting: patients.filter((p) => p.status === "waiting").length,
+      completed: patients.filter((p) => p.status === "completed").length,
+    };
+
     return NextResponse.json(
       {
         success: true,
         patients,
+        stats,
         count: patients.length,
       },
       { status: 200 }
