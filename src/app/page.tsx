@@ -60,15 +60,6 @@ export default function Home() {
               </div>
             </div>
             <div className="absolute -top-10 -right-10 w-48 h-48 bg-sky-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-            <div className="absolute top-20 -left-20 bg-white p-6 rounded-3xl shadow-2xl z-20 flex items-center gap-4">
-              <div className="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center text-white">
-                ✓
-              </div>
-              <div>
-                <p className="font-extrabold text-slate-800">Consultation</p>
-                <p className="text-xs text-slate-400">Available 24/7</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>

@@ -46,13 +46,16 @@ const Header: React.FC = () => {
           News
         </Link>
         <Link
-          href="/live-queue"
-          className="text-sm font-semibold text-slate-500 hover:text-sky-500 transition-colors"
+          href="/doctor/login"
+          className="px-6 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-full hover:bg-blue-600 transition-all"
         >
-          Live Status
-        </Link>
-        <Link href="/doctor/login" className="btn-primary py-2.5 px-8">
           Staff Login
+        </Link>
+        <Link
+          href="/live-queue"
+          className="px-6 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-full shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all"
+        >
+          Join queue
         </Link>
       </nav>
     </header>
