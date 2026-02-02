@@ -22,7 +22,6 @@ const articles = [
   },
   {
     tag: "Research",
-    // eslint-disable-next-line prettier/prettier
     title:
       "Studying OPD Waiting Time Patterns to Improve Future AI Predictions",
     date: "Dec 12, 2025",
@@ -48,8 +47,15 @@ export default function News() {
             key={i}
             className="flex gap-8 p-8 bg-white rounded-[40px] border border-slate-100 hover:shadow-2xl transition-all cursor-pointer group"
           >
-            <div className="w-48 h-48 bg-slate-50 rounded-[30px] shrink-0 flex items-center justify-center text-7xl group-hover:scale-105 transition-transform">
-              <Image src={a.img} alt="img" />
+            <div className="w-48 h-48 bg-slate-50 rounded-[30px] shrink-0 flex items-center justify-center text-7xl group-hover:scale-105 transition-transform overflow-hidden">
+              <Image
+                src={a.img}
+                alt={a.title}
+                className="w-full h-full object-cover"
+                width={1200}
+                height={800}
+                unoptimized
+              />
             </div>
 
             <div className="flex flex-col justify-center">
