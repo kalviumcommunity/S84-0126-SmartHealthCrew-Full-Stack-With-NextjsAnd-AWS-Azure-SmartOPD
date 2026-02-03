@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminLoginSchema } from "@/lib/schemas/adminSchema";
+import { ZodError } from "zod";
 import { comparePassword, signAdminToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { serialize } from "cookie";
@@ -6,19 +8,11 @@ import { serialize } from "cookie";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, password } = body;
-
-    // Validation
-    if (!email || !password) {
-      return NextResponse.json(
-        { success: false, message: "Email and password are required" },
-        { status: 400 }
-      );
-    }
+    const validated = adminLoginSchema.parse(body);
 
     // Find admin by email
     const admin = await prisma.admin.findUnique({
-      where: { email },
+      where: { email: validated.email },
     });
 
     if (!admin) {
@@ -29,7 +23,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Compare password
-    const isPasswordValid = await comparePassword(password, admin.password);
+    const isPasswordValid = await comparePassword(
+      validated.password,
+      admin.password
+    );
 
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -70,6 +67,19 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Validation error",
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        },
+        { status: 400 }
+      );
+    }
     console.error("Admin login error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
