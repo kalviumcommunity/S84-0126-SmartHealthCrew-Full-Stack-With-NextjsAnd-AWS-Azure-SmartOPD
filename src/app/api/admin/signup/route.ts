@@ -1,40 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminSignupSchema } from "@/lib/schemas/adminSchema";
+import { ZodError } from "zod";
 import { hashPassword } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, password } = body;
-
-    // Validation
-    if (!email || !password) {
-      return NextResponse.json(
-        { success: false, message: "Email and password are required" },
-        { status: 400 }
-      );
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid email format" },
-        { status: 400 }
-      );
-    }
-
-    // Validate password length
-    if (password.length < 6) {
-      return NextResponse.json(
-        { success: false, message: "Password must be at least 6 characters" },
-        { status: 400 }
-      );
-    }
+    const validated = adminSignupSchema.parse(body);
 
     // Check if admin already exists
     const existingAdmin = await prisma.admin.findUnique({
-      where: { email },
+      where: { email: validated.email },
     });
 
     if (existingAdmin) {
@@ -45,12 +22,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await hashPassword(validated.password);
 
     // Create admin
     const admin = await prisma.admin.create({
       data: {
-        email,
+        email: validated.email,
         password: hashedPassword,
       },
     });
@@ -64,6 +41,19 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Validation Error",
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        },
+        { status: 400 }
+      );
+    }
     console.error("Admin signup error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },

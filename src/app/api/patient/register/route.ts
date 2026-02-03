@@ -1,8 +1,12 @@
+import { patientRegisterSchema } from "@/lib/schemas/patientSchema";
+import { ZodError } from "zod";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { name, phone } = await req.json();
+    const data = await req.json();
+    const validated = patientRegisterSchema.parse(data);
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Get last token
@@ -16,8 +20,8 @@ export async function POST(req: Request) {
       // 2. Create patient
       const patient = await tx.patient.create({
         data: {
-          name,
-          phone,
+          name: validated.name,
+          phone: validated.phone,
           token: newToken,
         },
       });
@@ -39,6 +43,19 @@ export async function POST(req: Request) {
       message: "Token generated successfully",
     });
   } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Validation failed",
+          errors: error.errors.map((e) => ({
+            field: e.path[0],
+            message: e.message,
+          })),
+        },
+        { status: 400 }
+      );
+    }
     console.error("Transaction failed:", error);
     return Response.json(
       { success: false, message: "Registration failed" },
