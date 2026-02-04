@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendSuccess, sendError } from "@/lib/responseHandler";
+import { ERROR_CODES } from "@/lib/errorCodes";
 
 /**
  * GET /api/patients
@@ -10,11 +11,13 @@ export async function GET() {
     const patients = await prisma.patient.findMany({
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(patients);
+    return sendSuccess(patients, "Patients fetched successfully");
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch patients" },
-      { status: 500 }
+    return sendError(
+      "Failed to fetch patients",
+      ERROR_CODES.DATABASE_FAILURE,
+      500,
+      error
     );
   }
 }
@@ -30,9 +33,10 @@ export async function POST(req: Request) {
 
     // Validate input
     if (!name || !phone) {
-      return NextResponse.json(
-        { error: "Name and phone are required" },
-        { status: 400 }
+      return sendError(
+        "Name and phone are required",
+        ERROR_CODES.VALIDATION_ERROR,
+        400
       );
     }
 
@@ -48,11 +52,13 @@ export async function POST(req: Request) {
       data: { name, phone, token: newToken },
     });
 
-    return NextResponse.json(patient, { status: 201 });
+    return sendSuccess(patient, "Patient created successfully", 201);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to create patient" },
-      { status: 500 }
+    return sendError(
+      "Failed to create patient",
+      ERROR_CODES.DATABASE_FAILURE,
+      500,
+      error
     );
   }
 }
