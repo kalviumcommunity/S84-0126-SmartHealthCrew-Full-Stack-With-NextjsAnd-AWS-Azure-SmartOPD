@@ -4,6 +4,8 @@ import { ZodError } from "zod";
 import { comparePassword, signAdminToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { serialize } from "cookie";
+import { sendError } from "@/lib/responseHandler";
+import { ERROR_CODES } from "@/lib/errorCodes";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,9 +18,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!admin) {
-      return NextResponse.json(
-        { success: false, message: "Invalid credentials" },
-        { status: 401 }
+      return sendError(
+        "Invalid credentials",
+        ERROR_CODES.VALIDATION_ERROR,
+        401
       );
     }
 
@@ -29,9 +32,10 @@ export async function POST(req: NextRequest) {
     );
 
     if (!isPasswordValid) {
-      return NextResponse.json(
-        { success: false, message: "Invalid credentials" },
-        { status: 401 }
+      return sendError(
+        "Invalid credentials",
+        ERROR_CODES.VALIDATION_ERROR,
+        401
       );
     }
 
@@ -68,22 +72,21 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     if (error instanceof ZodError) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Validation error",
-          errors: error.errors.map((e) => ({
-            field: e.path[0],
-            message: e.message,
-          })),
-        },
-        { status: 400 }
+      return sendError(
+        "Validation error",
+        ERROR_CODES.VALIDATION_ERROR,
+        400,
+        error.errors.map((e) => ({
+          field: e.path[0],
+          message: e.message,
+        }))
       );
     }
-    console.error("Admin login error:", error);
-    return NextResponse.json(
-      { success: false, message: "Internal server error" },
-      { status: 500 }
+    return sendError(
+      "Internal server error",
+      ERROR_CODES.INTERNAL_ERROR,
+      500,
+      error
     );
   }
 }
