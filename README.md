@@ -1,6 +1,26 @@
 # SmartOPD - Digital Queue Management System
 
-**A Lightweight Web-Based Queue System for Tier-2/3 City Hospitals**
+**A Secure, Cloud-Based Queue System for Tier-2/3 City Hospitals**
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-blue)](https://neon.tech/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748)](https://www.prisma.io/)
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#-overview)
+- [Problem Statement](#-problem-statement)
+- [Key Features](#-key-features)
+- [Tech Stack](#️-tech-stack)
+- [Security & Authentication](#-security--authentication)
+- [Rendering Strategies](#-rendering-strategies)
+- [Database Architecture](#-database-architecture)
+- [API Documentation](#-api-documentation)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
 
 ---
 
@@ -8,7 +28,12 @@
 
 SmartOPD is a lightweight digital queue management system designed to eliminate physical waiting lines in hospitals, especially in Tier-2 and Tier-3 cities where expensive queue management systems are not affordable.
 
-This project demonstrates advanced Next.js rendering strategies (SSG, SSR, ISR) applied to a real-world healthcare scenario.
+This project demonstrates:
+- ✅ **Advanced Next.js rendering strategies** (SSG, SSR, ISR)
+- ✅ **Secure authentication & authorization** (JWT + bcrypt)
+- ✅ **Role-Based Access Control (RBAC)** middleware
+- ✅ **Real-world healthcare scenario** implementation
+- ✅ **Database design with Prisma ORM**
 
 ---
 
@@ -27,24 +52,202 @@ Hospitals in Tier-2 and Tier-3 cities face significant challenges:
 
 ## ✨ Key Features
 
-- **Zero Hardware Required** - Fully web-based, works on any device
-- **Real-time Updates** - Queue status updates under 200ms
-- **Cloud-Based** - Scalable and accessible from anywhere
-- **Budget-Friendly** - Affordable for Tier-2/3 hospitals
-- **Patient Portal** - Check queue position from home
-- **Admin Dashboard** - Manage queue, call next patient, mark consultations complete
+### Core Functionality
+- 🏥 **Zero Hardware Required** - Fully web-based, works on any device
+- ⚡ **Real-time Updates** - Queue status updates under 200ms
+- ☁️ **Cloud-Based** - Scalable and accessible from anywhere
+- 💰 **Budget-Friendly** - Affordable for Tier-2/3 hospitals
+
+### User Features
+- 👨‍⚕️ **Patient Portal** - Check queue position from home
+- 📊 **Admin Dashboard** - Manage queue, call next patient
+- 🔔 **Status Updates** - Real-time consultation completion tracking
+
+### Technical Features
+- 🔐 **Secure Authentication** - JWT + bcrypt password hashing
+- 🛡️ **RBAC Middleware** - Role-based route protection
+- 📈 **Optimized Rendering** - SSG, SSR, ISR strategies
+- 🗄️ **PostgreSQL + Prisma** - Robust database with migrations
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend & Backend
+- **Framework:** Next.js 16 with App Router
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Runtime:** Node.js
+
+### Database & ORM
+- **Database:** PostgreSQL (Neon)
+- **ORM:** Prisma
+- **Migrations:** Prisma Migrate
+- **Seeding:** TypeScript seed scripts
+
+### Security & Authentication
+- **Password Hashing:** bcrypt (10 rounds)
+- **Token Management:** JWT (JSON Web Tokens)
+- **Authorization:** Custom RBAC middleware
+- **Cookie Handling:** HTTP-only, secure cookies
+
+### Code Quality
+- **Linting:** ESLint with Prettier
+- **Type Safety:** TypeScript strict mode
+- **Validation:** Zod schemas
+- **Git Hooks:** Husky + lint-staged
+
+---
+
+## 🔐 Security & Authentication
+
+### Authentication Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    AUTHENTICATION FLOW                      │
+└─────────────────────────────────────────────────────────────┘
+
+1. SIGNUP
+   User submits → Validate → Hash password (bcrypt) → Save to DB
+
+2. LOGIN
+   User submits → Verify email → Compare password → Generate JWT
+   
+3. PROTECTED ROUTE ACCESS
+   Request → Extract token → Verify JWT → Check role → Allow/Deny
+```
+
+### Password Security (bcrypt)
+
+```typescript
+// Password hashing during signup
+const hashedPassword = await bcrypt.hash(password, 10);
+// Cost factor: 10 rounds (2^10 = 1024 iterations)
+
+// Password verification during login
+const isValid = await bcrypt.compare(password, storedHash);
+```
+
+**Why bcrypt?**
+- ✅ **Irreversible** - Cannot decrypt hash back to original password
+- ✅ **Unique salts** - Same password produces different hashes
+- ✅ **Slow by design** - Prevents rapid brute-force attacks
+- ✅ **Industry standard** - Battle-tested security algorithm
+
+### JWT (JSON Web Tokens)
+
+```typescript
+// Token structure: Header.Payload.Signature
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+.eyJhZG1pbklkIjoxLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6ImFkbWluIn0
+.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+```
+
+**Payload includes:**
+```json
+{
+  "adminId": 1,
+  "email": "admin@example.com",
+  "role": "admin",
+  "iat": 1738742400,
+  "exp": 1738828800
+}
+```
+
+**Token Properties:**
+- ✅ **Stateless** - No server-side session storage needed
+- ✅ **Tamper-proof** - Signature invalidates if modified
+- ✅ **Time-limited** - Expires after 24 hours
+- ⚠️ **Secure storage** - Stored in HTTP-only cookies + Authorization header
+
+---
+
+## 🛡️ Role-Based Access Control (RBAC)
+
+### Authorization Middleware
+
+SmartOPD implements a custom Next.js middleware for RBAC:
+
+```typescript
+// middleware.ts (root level)
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  
+  // Extract token from header/cookie
+  const token = extractToken(req);
+  
+  // Verify JWT signature
+  const decoded = verifyAdminToken(token);
+  
+  // Check role-based permissions
+  if (pathname.startsWith("/api/admin") && decoded.role !== "admin") {
+    return NextResponse.json(
+      { message: "Access denied. Admin privileges required." },
+      { status: 403 }
+    );
+  }
+  
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/api/admin/:path*", "/api/users/:path*"],
+};
+```
+
+### Authorization Flow Diagram
+
+```
+┌──────────────┐
+│ Client Request│
+└──────┬───────┘
+       │
+       ▼
+┌─────────────────────────────────────────────┐
+│         MIDDLEWARE (middleware.ts)          │
+├─────────────────────────────────────────────┤
+│ 1. Extract token (Header/Cookie)            │
+│ 2. Verify JWT signature                     │
+│ 3. Decode payload (adminId, email, role)    │
+│ 4. Check route permissions                  │
+└──────┬─────────────────────┬────────────────┘
+       │                     │
+       ▼                     ▼
+  ┌─────────┐          ┌──────────┐
+  │ ✅ ALLOW │          │ ❌ DENY  │
+  │  (200)  │          │  (403)   │
+  └─────────┘          └──────────┘
+```
+
+### Protected Routes
+
+| Route Pattern | Required Role | Description |
+|--------------|---------------|-------------|
+| `/api/admin/*` | `admin` | Admin-only operations (patient management) |
+| `/api/users/*` | Any authenticated | General user operations |
+| `/api/auth/*` | Public | Login/Signup endpoints |
+| `/api/patients` | Public | Patient registration |
+| `/api/queue/*` | Public | Queue status checking |
+
+### RBAC Benefits
+
+✅ **Least Privilege Principle** - Users only access what they need  
+✅ **Centralized Authorization** - Single middleware controls all access  
+✅ **Easy Role Extension** - Add `doctor`, `nurse` roles in future  
+✅ **Audit Trail Ready** - Logs all authorization attempts  
 
 ---
 
 ## 🚀 Rendering Strategies Implementation
 
-### 1️⃣ Static Rendering (SSG) - About Page
+### 1️⃣ Static Site Generation (SSG) - About Page
 
 **File:** `src/app/about/page.tsx`
 
 ```tsx
-// STATIC RENDERING (SSG) — Pre-rendered at build time
-export const revalidate = false; // No re-rendering after build
+// Pre-rendered at build time
+export const revalidate = false;
 
 export default function About() {
   return (
@@ -56,250 +259,290 @@ export default function About() {
 }
 ```
 
-**Why SSG for About Page:**
-- Content rarely changes
-- Fastest load time (served from CDN)
-- Zero server cost per request
-- Perfect for static information
+**Why SSG?**
+- ✅ Fastest load time (served from CDN)
+- ✅ Zero server cost per request
+- ✅ Perfect for static content (About, Terms, Privacy)
+- ❌ Not suitable for dynamic data
 
 ---
 
-### 2️⃣ Dynamic Rendering (SSR) - Live Queue Status
+### 2️⃣ Server-Side Rendering (SSR) - Live Queue
 
 **File:** `src/app/live-queue/page.tsx`
 
 ```tsx
-// DYNAMIC RENDERING (SSR) — Always fresh data
+// Always fresh data on every request
 export const dynamic = 'force-dynamic';
 
 export default async function LiveQueue() {
-  const res = await fetch("https://dummyjson.com/posts/1", { cache: "no-store" });
+  const res = await fetch("API_URL", { cache: "no-store" });
   const data = await res.json();
 
-  return (
-    <div>
-      <h1>Live Queue Status (SSR)</h1>
-      <p>Data fetched at request time: {data.title}</p>
-    </div>
-  );
+  return <div>Current Queue: {data.currentToken}</div>;
 }
 ```
 
-**Why SSR for Live Queue:**
-- Queue status changes rapidly
-- Real-time data essential for accuracy
-- Fresh response on every request
-- Critical for hospital operations
+**Why SSR?**
+- ✅ Real-time data accuracy
+- ✅ Fresh on every request
+- ✅ Critical for queue status
+- ❌ Higher server load
 
 ---
 
-### 3️⃣ Hybrid Rendering (ISR) - SmartOPD Updates
+### 3️⃣ Incremental Static Regeneration (ISR) - News
 
 **File:** `src/app/news/page.tsx`
 
 ```tsx
-// HYBRID RENDERING (ISR) — Regenerates every 60s
+// Regenerates every 60 seconds
 export const revalidate = 60;
 
 export default async function News() {
-  const res = await fetch("https://dummyjson.com/posts", { next: { revalidate: 60 }});
+  const res = await fetch("API_URL", { next: { revalidate: 60 }});
   const data = await res.json();
 
-  return (
-    <div>
-      <h1>SmartOPD Updates (ISR)</h1>
-      <p>This page updates every 60 seconds using ISR.</p>
-      <p>Fetched posts: {data.posts.length}</p>
-    </div>
-  );
+  return <div>Latest Updates: {data.posts.length}</div>;
 }
 ```
 
-**Why ISR for Updates:**
-- Updates occasionally, not every second
-- Speed of static pages + periodic freshness
-- Reduced cost compared to SSR
-- Perfect balance for announcements
+**Why ISR?**
+- ✅ Speed of SSG + freshness of SSR
+- ✅ Reduces server load
+- ✅ Perfect balance for announcements
+- ✅ Stale-while-revalidate strategy
 
 ---
 
-## 📊 Case Study: DailyEdge News Portal
+### Rendering Strategy Comparison
 
-### Problem Summary
-DailyEdge statically generated their homepage → **fast but breaking news became stale**.  
-They switched to SSR → **fresh but slow and expensive** due to high server load.
+| Strategy | Speed | Freshness | Scalability | Use Case |
+|----------|-------|-----------|-------------|----------|
+| **SSG** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐⭐⭐ | About, Terms |
+| **SSR** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | Live Queue |
+| **ISR** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | News, Updates |
 
-### Trade-Off Triangle
-
-| Rendering | Speed | Freshness | Scalability |
-|----------|--------|-----------|-------------|
-| SSG | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐⭐⭐ |
-| SSR | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
-| ISR | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-
-### Proposed Balanced Solution
-- Use **ISR** for Breaking News → updates every 30–60 seconds
-- Use **SSG** for evergreen articles
-- Use **SSR** only for heavy personalized pages (dashboards)
-
-**Result:** Reduces cost, improves speed, and keeps content reasonably fresh.
-
-### Applied to SmartOPD
-
-| Page | Rendering Mode | Reason |
-|------|----------------|--------|
-| About | SSG | No frequent changes |
-| Live Queue | SSR | Must always be fresh |
-| SmartOPD Updates | ISR | Changes occasionally |
-
-This combination balances:
-- **Speed** ⚡ - Fast page loads
-- **Real-time accuracy** 🔄 - When needed
-- **Cost-efficiency** 💰 - Optimized resources
-
-**Trade-off Insight:**
-- SSG gives you: Speed + Scalability (but stale data)
-- SSR gives you: Freshness + Accuracy (but slower + costly)
-- ISR gives you: Speed + Reasonable Freshness (balanced approach)
-
-Each rendering mode gives you **two out of three** — choose wisely!
+**Key Insight:** Each rendering mode gives you **two out of three** (Speed, Freshness, Scalability) — choose wisely based on your data requirements!
 
 ---
 
----
+## 🗄️ Database Architecture
 
-## 🛠️ Tech Stack
+### Prisma Schema
 
-### Current Implementation
-- **Frontend + Backend:** Next.js 16 with App Router
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **Runtime:** Node.js
-- **Database:** PostgreSQL with Prisma ORM
+```prisma
+model Patient {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  token     Int      @unique
+  status    String   @default("waiting")
+  createdAt DateTime @default(now())
 
-### Planned Architecture
-- **Caching:** Redis for real-time queue updates
-- **Containerization:** Docker
-- **Deployment:** AWS/Azure
-- **CI/CD:** GitHub Actions
+  queueTokens QueueToken[]
 
----
+  @@index([token])
+  @@index([phone])
+}
 
-## 📦 Prisma ORM Setup
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
 
-### What We Implemented
+  @@index([email])
+}
 
-✅ **Installed Prisma ORM**
-- Installed `prisma` as dev dependency
-- Installed `@prisma/client` for database queries
+model QueueToken {
+  id        Int      @id @default(autoincrement())
+  token     Int
+  status    String   @default("waiting")
+  createdAt DateTime @default(now())
 
-✅ **Created Database Schema**
-- Defined `Patient` model (id, name, phone, token, status, createdAt)
-- Defined `Admin` model (id, username, password)
-- Configured PostgreSQL as database provider
+  patientId Int
+  patient   Patient  @relation(fields: [patientId], references: [id])
 
-✅ **Generated Prisma Client**
-- Auto-generated type-safe query builder
-- Includes all CRUD operations for Patient & Admin models
-
-✅ **Connected to PostgreSQL**
-- Set up `DATABASE_URL` in environment variables
-- Configured connection through `prisma.config.ts`
-
-✅ **Created Reusable Prisma Instance**
-- Built singleton pattern in `src/lib/prisma.ts`
-- Prevents multiple database connections during dev hot reload
-- Includes query logging for debugging
+  @@index([patientId])
+  @@index([token])
+}
+```
 
 ### Why Prisma?
 
-- **Type Safety** - Auto-generated TypeScript types prevent runtime errors
-- **Developer Experience** - Intuitive API, IntelliSense support, auto-completion
-- **Prevents SQL Injection** - Parameterized queries by default
-- **Easy Migrations** - Database schema versioning and migration management
-- **Built for Next.js** - Perfect integration with API routes and server components
-- **Auto-Generated Queries** - No need to write raw SQL
+- ✅ **Type Safety** - Auto-generated TypeScript types
+- ✅ **SQL Injection Prevention** - Parameterized queries by default
+- ✅ **Migration Management** - Version-controlled schema changes
+- ✅ **Developer Experience** - Intuitive API, IntelliSense support
+- ✅ **Optimized Queries** - Automatic index suggestions
 
-### Project Structure After Prisma Setup
+### Database Migrations
 
-```
-SmartOPD/
-├── prisma/
-│   ├── schema.prisma          # Database schema definition
-│   └── migrations/            # Database migrations (future)
-├── prisma.config.ts           # Prisma configuration
-├── src/
-│   ├── lib/
-│   │   └── prisma.ts          # Reusable Prisma client instance
-│   ├── app/
-│   │   └── test-prisma/
-│   │       └── page.tsx       # Test page for Prisma connection
-└── .env                       # Database connection string
-```
+```bash
+# Create new migration
+npx prisma migrate dev --name add_admin_role
 
-### Usage Example
+# Apply migrations to production
+npx prisma migrate deploy
 
-```typescript
-import { prisma } from "@/lib/prisma";
+# Reset database (dev only)
+npx prisma migrate reset
 
-// Get all patients
-const patients = await prisma.patient.findMany();
-
-// Create a new patient
-const newPatient = await prisma.patient.create({
-  data: {
-    name: "John Doe",
-    phone: "1234567890",
-    token: 101,
-    status: "waiting"
-  }
-});
-
-// Update patient status
-const updated = await prisma.patient.update({
-  where: { id: 1 },
-  data: { status: "completed" }
-});
+# Check migration status
+npx prisma migrate status
 ```
 
 ---
 
-## 📁 Project Structure
+## 📡 API Documentation
 
+### Authentication APIs
+
+#### 1. Admin Signup
+
+**Endpoint:** `POST /api/admin/signup`
+
+**Request:**
+```json
+{
+  "email": "admin@example.com",
+  "password": "SecurePass123"
+}
 ```
-SmartOPD/
-├── prisma/
-│   ├── schema.prisma             # Prisma database schema
-│   └── migrations/               # Database migrations (future)
-├── prisma.config.ts              # Prisma configuration
-├── src/
-│   ├── app/
-│   │   ├── page.tsx              # Home page
-│   │   ├── about/
-│   │   │   └── page.tsx          # About SmartOPD (SSG)
-│   │   ├── live-queue/
-│   │   │   └── page.tsx          # Live Queue Status (SSR)
-│   │   ├── news/
-│   │   │   └── page.tsx          # SmartOPD Updates (ISR)
-│   │   ├── test-prisma/
-│   │   │   └── page.tsx          # Prisma connection test
-│   │   ├── layout.tsx            # Root layout
-│   │   └── globals.css           # Global styles
-│   │
-│   ├── components/               # Reusable UI components (future)
-│   └── lib/
-│       ├── prisma.ts             # Prisma client instance
-│       ├── constants.ts          # Constants
-│       └── types.ts              # TypeScript types
-│
-├── public/                       # Static assets
-├── .env                          # Environment variables (database URL)
-├── .env.example                  # Example environment variables
-├── .gitignore
-├── package.json
-├── tsconfig.json
-├── next.config.ts
-└── README.md
+
+**Success Response (201):**
+```json
+{
+  "success": true,
+  "message": "Admin account created successfully",
+  "adminId": 1
+}
+```
+
+**Error Response (409):**
+```json
+{
+  "success": false,
+  "message": "Admin with this email already exists"
+}
+```
+
+---
+
+#### 2. Admin Login
+
+**Endpoint:** `POST /api/admin/login`
+
+**Request:**
+```json
+{
+  "email": "admin@example.com",
+  "password": "SecurePass123"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "admin": {
+    "id": 1,
+    "email": "admin@example.com",
+    "role": "admin"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Headers Set:**
+```http
+Set-Cookie: adminToken=<JWT>; HttpOnly; Secure; SameSite=Strict; Max-Age=86400
+```
+
+**Error Response (401):**
+```json
+{
+  "success": false,
+  "message": "Invalid credentials"
+}
+```
+
+---
+
+#### 3. Protected Route Example
+
+**Endpoint:** `GET /api/admin/patients`
+
+**Headers:**
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "patients": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "phone": "1234567890",
+      "token": 101,
+      "status": "waiting"
+    }
+  ]
+}
+```
+
+**Error Response (401 - Missing Token):**
+```json
+{
+  "success": false,
+  "message": "Authentication required. Please provide a valid token."
+}
+```
+
+**Error Response (403 - Invalid Role):**
+```json
+{
+  "success": false,
+  "message": "Access denied. Admin privileges required."
+}
+```
+
+---
+
+### Queue Management APIs
+
+#### 1. Get Current Queue
+
+**Endpoint:** `GET /api/queue/current`
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "currentToken": 105,
+  "waitingCount": 12
+}
+```
+
+---
+
+#### 2. Call Next Patient
+
+**Endpoint:** `POST /api/queue/next`
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "message": "Next patient called",
+  "token": 106
+}
 ```
 
 ---
@@ -310,6 +553,7 @@ SmartOPD/
 
 - Node.js (v18 or higher)
 - npm or yarn
+- PostgreSQL database (Neon recommended)
 
 ### Installation
 
@@ -320,542 +564,207 @@ cd SmartOPD
 
 # Install dependencies
 npm install
-```
 
-### Environment Variables Setup
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your DATABASE_URL and JWT_SECRET
 
-SmartOPD uses environment variables to manage configuration securely. Follow these steps:
+# Generate Prisma Client
+npx prisma generate
 
-1. **Copy the example environment file:**
-   ```bash
-   cp .env.example .env.local
-   ```
+# Run database migrations
+npx prisma migrate deploy
 
-2. **Fill in real values in `.env.local`:**
-   ```bash
-   # === SERVER ONLY VARIABLES ===
-   DATABASE_URL=postgres://user:password@localhost:5432/smartopd
-   REDIS_URL=redis://localhost:6379
-   JWT_SECRET=your-secret-key
+# Seed the database (optional)
+npx tsx prisma/seed.ts
 
-   # === CLIENT SAFE VARIABLES ===
-   NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
-   ```
-
-3. **⚠️ IMPORTANT: Never commit `.env.local` to Git**  
-   This file contains real secrets and is already in `.gitignore`.
-
-4. **Environment Variables Reference:**
-
-   | Variable | Type | Description |
-   |----------|------|-------------|
-   | `DATABASE_URL` | Server-only | PostgreSQL connection string |
-   | `REDIS_URL` | Server-only | Redis connection string for caching |
-   | `JWT_SECRET` | Server-only | Secret key for JWT token generation |
-   | `NEXT_PUBLIC_API_BASE_URL` | Client-safe | API base URL (accessible in browser) |
-
-   **Usage in Code:**
-   ```tsx
-   // ✅ Server-side usage (API routes, server components)
-   const dbUrl = process.env.DATABASE_URL;
-   
-   // ✅ Client-side usage (only NEXT_PUBLIC_ variables)
-   const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-   
-   // ❌ WRONG: Server variables in client code
-   console.log(process.env.DATABASE_URL); // Won't work in browser
-   ```
-
-### Running the Development Server
-
-```bash
+# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Visit `http://localhost:3000` to see the app.
 
-### Building for Production
+---
+
+## 📁 Project Structure
+
+```
+SmartOPD/
+├── prisma/
+│   ├── schema.prisma              # Database schema
+│   ├── seed.ts                    # Seed script
+│   └── migrations/                # Migration history
+│
+├── src/
+│   ├── app/
+│   │   ├── page.tsx               # Home page
+│   │   ├── about/page.tsx         # SSG example
+│   │   ├── live-queue/page.tsx    # SSR example
+│   │   ├── news/page.tsx          # ISR example
+│   │   │
+│   │   └── api/
+│   │       ├── admin/             # Admin routes (protected)
+│   │       │   ├── login/route.ts
+│   │       │   ├── signup/route.ts
+│   │       │   └── patients/route.ts
+│   │       │
+│   │       ├── auth/              # Legacy auth routes
+│   │       ├── patients/          # Patient operations
+│   │       └── queue/             # Queue management
+│   │
+│   └── lib/
+│       ├── auth.ts                # JWT & bcrypt functions
+│       ├── prisma.ts              # Prisma client singleton
+│       ├── adminMiddleware.ts     # Route validation
+│       ├── responseHandler.ts     # Standardized responses
+│       ├── errorCodes.ts          # Error code constants
+│       └── schemas/               # Zod validation schemas
+│
+├── middleware.ts                  # RBAC middleware (root)
+├── .env                           # Environment variables
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+---
+
+## 🧪 Testing RBAC
+
+### Test Scenario 1: Admin Login & Access
 
 ```bash
-npm run build
-npm start
+# 1. Login as admin
+curl -X POST http://localhost:3000/api/admin/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"admin123"}'
+
+# Response includes token:
+# {"success":true,"token":"eyJhbGci...","admin":{"role":"admin"}}
+
+# 2. Access admin route with token
+curl -X GET http://localhost:3000/api/admin/patients \
+  -H "Authorization: Bearer <TOKEN>"
+
+# ✅ Expected: 200 OK with patient list
 ```
 
 ---
 
-## 📄 Pages & Rendering Modes
+### Test Scenario 2: Missing Token
 
-| Page | Route | Rendering | Revalidation | Use Case |
-|------|-------|-----------|--------------|----------|
-| **Home** | `/` | Mixed | N/A | Landing page |
-| **About SmartOPD** | `/about` | SSG | `false` | Static content, rarely changes |
-| **Live Queue Status** | `/live-queue` | SSR | N/A | Real-time queue data, always fresh |
-| **SmartOPD Updates** | `/news` | ISR | `60s` | Periodic updates, balanced performance |
-
----
-
-## 🎓 Learning Outcomes
-
-This project demonstrates understanding of:
-
-1. **Next.js App Router** - Modern file-based routing
-2. **Server Components** - React Server Components architecture
-3. **Data Fetching Strategies** - `fetch` with caching options
-4. **Rendering Modes** - SSG, SSR, ISR configuration
-5. **Performance Optimization** - Choosing the right rendering strategy
-6. **Real-world Application** - Applied to healthcare domain
-
----
-
-## 🔄 Rendering Strategy Decision Matrix
-
-**When to use SSG (Static):**
-- Content doesn't change often (e.g., About, FAQs, Documentation)
-- Same content for all users
-- Need maximum performance and lowest cost
-
-**When to use SSR (Dynamic):**
-- Content changes frequently (e.g., Live dashboards, User profiles)
-- User-specific or personalized content
-- Need guaranteed fresh data on every request
-
-**When to use ISR (Hybrid):**
-- Content changes periodically (e.g., News, Product listings, Events)
-- Can tolerate brief staleness (seconds to minutes)
-- Need balance between speed and freshness
-
----
-
-## 📈 Performance Considerations
-
-### If SmartOPD had 10x more users:
-
-**Current Strategy:**
-- ✅ About page (SSG) - No change needed, scales infinitely
-- ⚠️ Live Queue (SSR) - Would need caching layer (Redis) or move to websockets
-- ✅ Updates (ISR) - Perfect as-is, handles increased load well
-
-**Recommended Changes at Scale:**
-1. Add Redis for queue caching
-2. Implement WebSocket connections for real-time queue updates
-3. Use CDN for static assets
-4. Consider edge computing for global users
-5. Implement rate limiting and request queuing
-
----
-
-## �️ Database & Migrations
-
-SmartOPD uses **Prisma** as its ORM and **PostgreSQL** (hosted on Neon) as its database.
-
-### 🔄 Migrations
-
-We follow a structured migration process to ensure database consistency.
-
-- **Initial Migration:** `20260127053924_add_auth_system`
-- **First Schema Setup:** Managed via `npx prisma migrate dev --name init_schema`
-
-Commands:
-- `npx prisma migrate dev`: Run migrations in development
-- `npx prisma migrate deploy`: Apply pending migrations in production
-- `npx prisma studio`: Open UI to view and edit data
-
-### 🌿 Seeding
-
-To quickly set up the local environment, run the seeding script to create a default admin user.
-
-**Command:**
 ```bash
-npx prisma db seed
-```
+# Try accessing protected route without token
+curl -X GET http://localhost:3000/api/admin/patients
 
-**What it does:**
-- Creates a default admin: `admin@example.com` / `admin123`
-- Uses `upsert` to ensure idempotency (no duplicate entries)
-- Hashes passwords using `bcrypt` for production safety
+# ❌ Expected: 401 Unauthorized
+# {"success":false,"message":"Authentication required. Please provide a valid token."}
+```
 
 ---
 
-## 🛠️ Production Safety & Best Practices
+### Test Scenario 3: Invalid/Expired Token
 
-- **Migrations Matter:** We avoid `prisma db push` in production to maintain a clear history of schema changes.
-- **Environment Isolation:** `DATABASE_URL` is managed via `.env` and secret management.
-- **Security:** Admin passwords are NEVER stored in plain text.
-- **Idempotent Seeding:** Scripts can be run multiple times without corrupting data.
+```bash
+# Use invalid token
+curl -X GET http://localhost:3000/api/admin/patients \
+  -H "Authorization: Bearer INVALID_TOKEN"
+
+# ❌ Expected: 403 Forbidden
+# {"success":false,"message":"Invalid or expired token. Please login again."}
+```
 
 ---
 
-## �🔧 Code Quality Setup (Strict TS + ESLint + Prettier + Husky)
+## 🔄 Development Workflow
 
-### 🔹 Why Strict TypeScript?
-Strict mode catches:
-- Undefined types
-- Unused variables
-- Unused parameters
-- Implicit any errors
+### 1. Create Feature Branch
 
-This reduces runtime bugs and improves long-term maintainability.
+```bash
+git checkout main
+git pull origin main
+git checkout -b feat/your-feature-name
+```
 
-### 🔹 Why ESLint + Prettier?
-ESLint enforces code correctness (no console logs, semicolons, double quotes).  
-Prettier ensures consistent formatting across the entire team.
+### 2. Make Changes
 
-### 🔹 Why Pre-Commit Hooks (Husky)?
-Husky + lint-staged run ESLint and Prettier BEFORE every commit.  
-This means:
-- No team member can push broken code  
-- Code formatting stays consistent  
-- Quality is enforced automatically
+- Edit code
+- Run linter: `npm run lint`
+- Test locally: `npm run dev`
 
-### Result
-We now have a clean, consistent, professional codebase that enforces quality at every commit.
+### 3. Commit Changes
+
+```bash
+git add .
+git commit -m "feat: descriptive commit message"
+# Husky runs lint-staged automatically
+```
+
+### 4. Push & Create PR
+
+```bash
+git push origin feat/your-feature-name
+```
 
 ---
 
-## 🔄 Global API Response Handler
+## 📚 Key Learnings & Reflections
 
-### What is a Unified Response Format?
+### Why Least Privilege Matters
 
-A **unified response format** ensures all API endpoints return data in a consistent structure. This makes it easier for frontend developers to handle responses, debug issues, and maintain the codebase.
+- **Security:** Users only access what they need
+- **Compliance:** HIPAA requires role-based access for healthcare
+- **Auditability:** Track who accessed what data
+- **Scalability:** Easy to add new roles (doctor, nurse)
 
-### Response Handler Implementation
+### How to Add New Roles
 
-**File:** `src/lib/responseHandler.ts`
+1. Update Admin model in `schema.prisma`
+2. Run migration: `npx prisma migrate dev --name add_new_role`
+3. Modify middleware to check new role
+4. Update signup to allow role selection
 
-```typescript
-import { NextResponse } from "next/server";
+### What Happens Without Middleware?
 
-export const sendSuccess = (data: any, message = "Success", status = 200) => {
-  return NextResponse.json(
-    {
-      success: true,
-      message,
-      data,
-      timestamp: new Date().toISOString(),
-    },
-    { status }
-  );
-};
-
-export const sendError = (
-  message = "Something went wrong",
-  code = "INTERNAL_ERROR",
-  status = 500,
-  details?: any
-) => {
-  return NextResponse.json(
-    {
-      success: false,
-      message,
-      error: { code, details },
-      timestamp: new Date().toISOString(),
-    },
-    { status }
-  );
-};
-```
-
-### Error Codes
-
-**File:** `src/lib/errorCodes.ts`
-
-```typescript
-export const ERROR_CODES = {
-  VALIDATION_ERROR: "E001",
-  NOT_FOUND: "E002",
-  DATABASE_FAILURE: "E003",
-  INTERNAL_ERROR: "E500",
-};
-```
-
-### Success Response Example
-
-```json
-{
-  "success": true,
-  "message": "Patients fetched successfully",
-  "data": [
-    { "id": 1, "name": "Amit", "token": 101, "status": "waiting" }
-  ],
-  "timestamp": "2026-02-04T10:22:00.234Z"
-}
-```
-
-### Error Response Example
-
-```json
-{
-  "success": false,
-  "message": "Missing required field: email",
-  "error": {
-    "code": "E001",
-    "details": null
-  },
-  "timestamp": "2026-02-04T10:23:10.501Z"
-}
-```
-
-### Why Consistent API Responses Help Developers
-
-1. **Predictable Structure** - Frontend developers always know what to expect
-2. **Easier Debugging** - Timestamps help track when errors occurred
-3. **Better Error Handling** - Error codes allow programmatic handling of specific errors
-4. **Improved Documentation** - Consistent format is easier to document
-5. **Reduced Bugs** - Less chance of missing error cases when structure is standardized
-6. **Better UX** - Consistent messages can be displayed to users uniformly
-
-### Routes Updated with Global Response Handler
-
-| Route | File | Methods |
-|-------|------|---------|
-| `/api/patients` | `src/app/api/patients/route.ts` | GET, POST |
-| `/api/admin/login` | `src/app/api/admin/login/route.ts` | POST |
+- ❌ Anyone with any token can access admin routes
+- ❌ No authorization checks
+- ❌ Security vulnerability
+- ❌ Compliance violations
 
 ---
 
+## 🤝 Contributing
 
-## 📚 Resources
-
-- [Next.js Data Fetching Documentation](https://nextjs.org/docs/app/building-your-application/data-fetching)
-- [Understanding ISR](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating)
-- [Server vs Client Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
+1. Fork the repository
+2. Create feature branch (`feat/amazing-feature`)
+3. Commit changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to branch (`git push origin feat/amazing-feature`)
+5. Open Pull Request
 
 ---
 
 ## 📄 License
 
-This project is for educational purposes as part of an academic assignment.
+This project is licensed under the MIT License.
 
 ---
 
-## 👤 Author
+## 👨‍💻 Author
 
 **SmartOPD Team**
-- Assignment: Advanced Data Fetching & Rendering Modes
-- Framework: Next.js App Router
-- Focus: Real-world healthcare application
+
+- GitHub: [@kalviumcommunity](https://github.com/kalviumcommunity)
+- Project Repository: [S84-0126-SmartHealthCrew](https://github.com/kalviumcommunity/S84-0126-SmartHealthCrew-Full-Stack-With-NextjsAnd-AWS-Azure-SmartOPD)
 
 ---
 
-**Built with ❤️ using Next.js, TypeScript, and modern web technologies**
+## 🙏 Acknowledgments
+
+- Next.js Team for the amazing framework
+- Prisma Team for the excellent ORM
+- Neon for PostgreSQL hosting
+- Kalvium for project guidance
 
 ---
 
-## 🛠️ Data Modeling & PostgreSQL Schema
-
-### 📊 ER Diagram
-
-```mermaid
-erDiagram
-    Patient ||--o{ QueueToken : "has"
-    Patient {
-        Int id PK
-        String name
-        String phone
-        Int token UK
-        String status
-        DateTime createdAt
-    }
-    Admin {
-        Int id PK
-        String email UK
-        String password
-        DateTime createdAt
-    }
-    QueueToken {
-        Int id PK
-        Int token
-        String status
-        DateTime createdAt
-        Int patientId FK
-    }
-```
-
-### 📝 Schema Explanation
-
-The database consists of three core models designed for efficiency and scalability:
-
-1.  **Patient**: Represents a user who joins the queue.
-    *   `id`: Primary Key.
-    *   `token`: Unique queue number assigned to the patient.
-    *   `status`: Current state (waiting, completed).
-
-2.  **Admin**: Hospital staff who manages the queue.
-    *   `email`: Unique identifier for login.
-    *   `password`: Hashed password for security.
-
-3.  **QueueToken**: Stores historical queue data (optional but added for scalability).
-    *   `patientId`: Foreign Key linking to Patient.
-
-### 🔑 Keys & Constraints
-
-*   **Primary Keys (`@id`)**: `id` fields in all tables are auto-incrementing integers.
-*   **Unique Keys (`@unique`)**:
-    *   `Patient.token`: Ensures no two active patients have the same token.
-    *   `Admin.email`: Prevents duplicate admin accounts.
-*   **Foreign Keys (`@relation`)**:
-    *   `QueueToken.patientId` references `Patient.id`.
-*   **Default Values (`@default`)**:
-    *   `status`: Defaults to "waiting".
-    *   `createdAt`: Defaults to `now()`.
-
-### 📐 Normalization
-
-*   **1NF (First Normal Form)**: Atomic values (no repeating groups or arrays in columns).
-*   **2NF (Second Normal Form)**: All non-key attributes depend on the primary key.
-*   **3NF (Third Normal Form)**: No transitive dependencies; attributes depend only on the primary key.
-
-### ⚡ Migration Commands
-
-```bash
-# 1. Initialize Migration
-npx prisma migrate dev --name init_schema
-
-# 2. Seed Database
-npx prisma db seed
-
-# 3. Verify in Studio
-npx prisma studio
-```
-
-### 🌱 Seed Data Explanation
-
-The `prisma/seed.ts` script populates the database with initial test data:
-*   **Admin**: Creates a default admin `admin@example.com` with password `admin123` (hashed using bcrypt).
-*   **Patients**: Inserts sample patients (Amit, Sita) with tokens 1 and 2.
-
-### 📸 Data Verification
-
-*(Add Screenshot of Patient Table in Prisma Studio Here)*
-
-*(Add Screenshot of Admin Table in Prisma Studio Here)*
-
-### 🧠 Reflection: Scalability
-
-**Question:** If SmartOPD must support 10x more data, does the design support it?
-
-**Response:** Yes, the design supports scalability because:
-1.  **Indexing**: critical fields like `token` and `email` are unique and indexed, ensuring fast lookups even as data grows.
-2.  **History Separation**: The `QueueToken` table is designed to decouple active queue status from historical logs, preventing the main `Patient` table from becoming bloated over time.
-3.  **Normalization**: The schema is normalized to avoid data redundancy, saving storage and maintaining consistency.
-
- 
- - - - 
- 
- 
- 
- # #   � a�   T r a n s a c t i o n s   &   Q u e r y   O p t i m i z a t i o n 
- 
- 
- 
- S m a r t O P D   u s e s   P r i s m a   t r a n s a c t i o n s   t o   e n s u r e   d a t a   c o n s i s t e n c y   d u r i n g   c r i t i c a l   o p e r a t i o n s   l i k e   p a t i e n t   r e g i s t r a t i o n . 
- 
- 
- 
- # # #   � x    T r a n s a c t i o n   S c e n a r i o :   P a t i e n t   R e g i s t r a t i o n 
- 
- 
- 
- W h e n   a   p a t i e n t   r e g i s t e r s ,   t h r e e   o p e r a t i o n s   m u s t   h a p p e n   a t o m i c a l l y : 
- 
- 1 .     * * G e n e r a t e   T o k e n * * :   C a l c u l a t e   t h e   n e x t   a v a i l a b l e   t o k e n   n u m b e r . 
- 
- 2 .     * * C r e a t e   P a t i e n t * * :   I n s e r t   a   n e w   p a t i e n t   r e c o r d . 
- 
- 3 .     * * C r e a t e   Q u e u e   E n t r y * * :   I n s e r t   a   r e c o r d   i n t o   t h e   ` Q u e u e T o k e n `   t a b l e . 
- 
- 
- 
- W e   u s e   ` p r i s m a . $ t r a n s a c t i o n `   t o   b u n d l e   t h e s e   o p e r a t i o n s .   I f   a n y   s t e p   f a i l s   ( e . g . ,   t o k e n   g e n e r a t i o n   e r r o r ) ,   t h e   e n t i r e   t r a n s a c t i o n   r o l l s   b a c k ,   p r e v e n t i n g   p a r t i a l   d a t a   ( o r p h a n   r e c o r d s ) . 
- 
- 
- 
- # # #   � x: � � � �   R o l l b a c k   B e h a v i o r 
- 
- 
- 
- T o   g u a r a n t e e   d a t a   i n t e g r i t y : 
- 
- -   * * S u c c e s s * * :   A l l   d a t a b a s e   c h a n g e s   a r e   c o m m i t t e d   o n l y   i f   e v e r y   s t e p   i n   t h e   t r a n s a c t i o n   s u c c e e d s . 
- 
- -   * * R o l l b a c k * * :   I f   a n   e r r o r   o c c u r s   ( e . g . ,   d u p l i c a t e   t o k e n ,   n e t w o r k   f a i l u r e ) ,   P r i s m a   a u t o m a t i c a l l y   r o l l s   b a c k   a l l   c h a n g e s .   N o   p a t i e n t   i s   c r e a t e d   w i t h o u t   a   t o k e n ,   a n d   n o   t o k e n   i s   i s s u e d   w i t h o u t   a   p a t i e n t . 
- 
- 
- 
- # # #   � x �   I n d e x e s   A d d e d 
- 
- 
- 
- T o   i m p r o v e   q u e r y   p e r f o r m a n c e   a s   t h e   d a t a s e t   g r o w s ,   w e   a d d e d   t h e   f o l l o w i n g   i n d e x e s : 
- 
- 
- 
- *       * * P a t i e n t   M o d e l * * : 
- 
-         *       ` @ @ i n d e x ( [ t o k e n ] ) ` :   O p t i m i z e s   s e a r c h e s   b y   t o k e n   n u m b e r   ( e . g . ,   c h e c k i n g   s t a t u s ) . 
- 
-         *       ` @ @ i n d e x ( [ p h o n e ] ) ` :   O p t i m i z e s   p a t i e n t   l o o k u p s   b y   p h o n e   n u m b e r   d u r i n g   l o g i n / r e g i s t r a t i o n . 
- 
- *       * * Q u e u e T o k e n   M o d e l * * : 
- 
-         *       ` @ @ i n d e x ( [ p a t i e n t I d ] ) ` :   S p e e d s   u p   j o i n s   a n d   l o o k u p s   f o r   p a t i e n t   h i s t o r y . 
- 
-         *       ` @ @ i n d e x ( [ t o k e n ] ) ` :   O p t i m i z e s   t o k e n   v e r i f i c a t i o n . 
- 
- *       * * A d m i n   M o d e l * * : 
- 
-         *       ` @ @ i n d e x ( [ e m a i l ] ) ` :   A c c e l e r a t e s   a d m i n   l o g i n   l o o k u p s . 
- 
- 
- 
- # # #   � xa�   Q u e r y   O p t i m i z a t i o n   E x a m p l e s 
- 
- 
- 
- * * B a d   P r a c t i c e   ( O v e r - f e t c h i n g ) : * * 
- 
- F e t c h i n g   a l l   f i e l d s   w h e n   o n l y   a   f e w   a r e   n e e d e d   i n c r e a s e s   m e m o r y   u s a g e   a n d   n e t w o r k   l o a d . 
- 
- ` ` ` t y p e s c r i p t 
- 
- / /   � � R  F e t c h e s   h u g e   J S O N   w i t h   a l l   c o l u m n s 
- 
- a w a i t   p r i s m a . p a t i e n t . f i n d M a n y ( ) ; 
- 
- ` ` ` 
- 
- 
- 
- * * G o o d   P r a c t i c e   ( S e l e c t i o n   &   P a g i n a t i o n ) : * * 
- 
- S e l e c t   o n l y   n e c e s s a r y   f i e l d s   a n d   u s e   p a g i n a t i o n . 
- 
- ` ` ` t y p e s c r i p t 
- 
- / /   � S&   O p t i m i z e d   q u e r y 
- 
- a w a i t   p r i s m a . p a t i e n t . f i n d M a n y ( { 
- 
-     s e l e c t :   {   i d :   t r u e ,   n a m e :   t r u e ,   t o k e n :   t r u e ,   s t a t u s :   t r u e   } , 
- 
-     t a k e :   2 0 , 
- 
-     o r d e r B y :   {   c r e a t e d A t :   " d e s c "   } 
- 
- } ) ; 
- 
- ` ` ` 
- 
- 
- 
- # # #   � x� �   R e f l e c t i o n :   P e r f o r m a n c e   a t   S c a l e 
- 
- 
- 
- * * Q u e s t i o n : * *   H o w   d o   t h e s e   o p t i m i z a t i o n s   h e l p   i f   S m a r t O P D   s c a l e s   1 0 x ? 
- 
- 
- 
- * * R e s p o n s e : * *   I f   S m a r t O P D   s c a l e s   1 0 x ,   t h e   i n d e x i n g   o f   ` t o k e n ` ,   ` p h o n e ` ,   a n d   ` p a t i e n t I d `   e n s u r e s   c o n s t a n t - t i m e   l o o k u p s   ( O ( 1 )   o r   O ( l o g   n ) )   i n s t e a d   o f   f u l l   t a b l e   s c a n s   ( O ( n ) ) .   T h i s   k e e p s   r e s p o n s e   t i m e s   f a s t   e v e n   w i t h   m i l l i o n s   o f   r e c o r d s .   F u r t h e r m o r e ,   p r e v e n t i n g   o v e r - f e t c h i n g   r e d u c e s   t h e   l o a d   o n   t h e   d a t a b a s e   a n d   t h e   b a n d w i d t h   r e q u i r e d ,   a l l o w i n g   t h e   s e r v e r   t o   h a n d l e   m o r e   c o n c u r r e n t   r e q u e s t s . 
- 
- 
+**Made with ❤️ for Tier-2/3 City Hospitals**

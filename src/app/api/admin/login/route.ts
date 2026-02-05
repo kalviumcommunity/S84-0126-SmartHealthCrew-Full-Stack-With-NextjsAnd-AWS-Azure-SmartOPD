@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
     const token = signAdminToken({
       adminId: admin.id,
       email: admin.email,
+      role: admin.role,
     });
 
     // Create HTTP-only cookie
@@ -62,7 +63,9 @@ export async function POST(req: NextRequest) {
         admin: {
           id: admin.id,
           email: admin.email,
+          role: admin.role,
         },
+        token, // Return token for Authorization header
       },
       { status: 200 }
     );
