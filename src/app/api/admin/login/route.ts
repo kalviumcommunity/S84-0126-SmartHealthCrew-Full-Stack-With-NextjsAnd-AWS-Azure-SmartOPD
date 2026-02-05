@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         "Validation error",
         ERROR_CODES.VALIDATION_ERROR,
         400,
-        error.errors.map((e) => ({
+        error.issues.map((e) => ({
           field: e.path[0],
           message: e.message,
         }))
