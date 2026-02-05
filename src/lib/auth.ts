@@ -9,17 +9,19 @@ const SALT_ROUNDS = 10;
 export function signAdminToken(payload: {
   adminId: number;
   email: string;
+  role: string;
 }): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
 }
 
 export function verifyAdminToken(
   token: string
-): { adminId: number; email: string } | null {
+): { adminId: number; email: string; role: string } | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as {
       adminId: number;
       email: string;
+      role: string;
     };
     return decoded;
   } catch (error) {
