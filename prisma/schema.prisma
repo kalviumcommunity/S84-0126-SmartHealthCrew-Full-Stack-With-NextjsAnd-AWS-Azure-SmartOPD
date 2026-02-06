@@ -74,6 +74,7 @@ model Appointment {
   @@index([doctorId])
   @@index([dateTime])
   @@index([status])
+  @@index([status, dateTime])
 }
 
 model MedicalRecord {
