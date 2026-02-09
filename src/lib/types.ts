@@ -1,36 +1,74 @@
-export enum TokenStatus {
-  WAITING = "waiting",
-  SERVING = "serving",
-  COMPLETED = "completed",
-  SKIPPED = "skipped",
+export enum Role {
+  PATIENT = "PATIENT",
+  DOCTOR = "DOCTOR",
+  ADMIN = "ADMIN",
 }
 
-export enum QueueStatus {
-  ACTIVE = "active",
-  PAUSED = "paused",
+export enum DoctorStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
+export enum TokenStatus {
+  WAITING = "WAITING",
+  CALLED = "CALLED",
+  COMPLETED = "COMPLETED",
+  MISSED = "MISSED",
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
 }
 
 export interface Doctor {
   id: string;
+  userId: string;
   name: string;
-  url: string;
-  department: string;
   email: string;
-  queueStatus: QueueStatus;
-  avgTimePerPatient: number; // in minutes
+  url: string;
+  phone: string;
+  department: string;
+  licenseNo: string;
+  experience: number;
+  status: DoctorStatus;
+  isQueuePaused: boolean;
 }
 
-export interface QueueToken {
+export interface Token {
   id: string;
-  doctorId: string;
-  tokenNumber: number;
+  tokenNumber: string;
   patientName: string;
-  patientPhone: string;
+  age: number;
+  gender: string;
+  phone: string;
+  symptoms: string;
+  department: string;
+  preferredDoctorId?: string;
   status: TokenStatus;
   createdAt: number;
+  servedAt?: number;
 }
 
-export interface AppState {
-  doctors: Doctor[];
-  tokens: QueueToken[];
-}
+export const DEPARTMENTS = [
+  "General Medicine",
+  "Cardiology",
+  "Pediatrics",
+  "Orthopedics",
+  "Dermatology",
+  "Gastroenterology",
+  "Neurology",
+];
+
+export const DEPT_PREFIXES: Record<string, string> = {
+  "General Medicine": "GEN",
+  Cardiology: "CAR",
+  Pediatrics: "PED",
+  Orthopedics: "ORT",
+  Dermatology: "DER",
+  Gastroenterology: "GAS",
+  Neurology: "NEU",
+};
