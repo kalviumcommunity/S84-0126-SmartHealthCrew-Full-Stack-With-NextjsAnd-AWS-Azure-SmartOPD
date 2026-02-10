@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 "use client";
 
 import React, {
@@ -50,18 +49,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
     const savedTokens = localStorage.getItem("opd_tokens");
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUsers(
-      savedUsers
-        ? JSON.parse(savedUsers)
-        : [
-            {
-              id: "admin-1",
-              name: "Super Admin",
-              email: "admin@opdflow.com",
-              role: Role.ADMIN,
-            },
-          ]
-    );
+    setUsers([
+      {
+        id: "admin-1",
+        name: "Super Admin",
+        email: "admin@smartopd.com",
+        role: Role.ADMIN,
+      },
+    ]);
 
     if (savedDoctors) setDoctors(JSON.parse(savedDoctors));
     if (savedTokens) setTokens(JSON.parse(savedTokens));
