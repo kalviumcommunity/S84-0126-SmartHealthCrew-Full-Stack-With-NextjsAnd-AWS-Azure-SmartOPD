@@ -749,7 +749,40 @@ This project is licensed under the MIT License.
 
 ---
 
-## 👨‍💻 Author
+## �️ Error Handling
+
+This project implements a **Centralized Error Handling** strategy to ensure consistent logging and secure user responses.
+
+### Features
+- **Centralized Handler**: Wraps API logic to catch and process errors uniformly.
+- **Environment-Aware**:
+  - **Development**: Returns full stack traces.
+  - **Production**: Redacts sensitive info, returning generic messages.
+- **Structured Logging**: Uses a custom logger for consistent log formats.
+
+### Usage
+Import `handleError` in your API routes:
+
+```typescript
+import { handleError } from "@/lib/errorHandler";
+
+try {
+  // logic
+} catch (error) {
+  return handleError(error, "Route Name");
+}
+```
+
+### Development vs Production
+
+| Environment | Response Message | Stack Trace |
+|-------------|------------------|-------------|
+| **Development** | Real error message | Visible |
+| **Production** | "Something went wrong..." | Hidden (REDACTED) |
+
+---
+
+## �👨‍💻 Author
 
 **SmartOPD Team**
 
