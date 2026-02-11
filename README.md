@@ -781,7 +781,33 @@ try {
 | **Production** | "Something went wrong..." | Hidden (REDACTED) |
 
 ---
+## ⚡ Caching with Redis
 
+The application uses Redis (via `ioredis`) to implement a **Cache-Aside** strategy, significantly reducing database load for frequent read operations.
+
+### Features
+- **Cache-Aside Pattern**: Requests check Redis first. On miss, data is fetched from DB and cached.
+- **TTL (Time-To-Live)**: Cached data expires automatically (e.g., 60 seconds) to ensure eventual consistency.
+- **Invalidation**: Critical updates (like new user signup) trigger immediate cache deletion to prevent stale data.
+
+### Implementation Details
+- **Connection**: `src/lib/redis.ts` handles the Redis connection.
+- **Usage**:
+  - `GET /api/users`: Caches the list of users for 60 seconds.
+  - `POST /api/auth/signup`: Invalidates the `users:list` cache key upon creating a new user.
+
+### Performance Impact
+| Condition | Response Source | Estimated Latency |
+|-----------|-----------------|-------------------|
+| **Cache Miss** | Database (Postgres) | ~100-200ms |
+| **Cache Hit** | Redis (Memory) | ~10-20ms |
+
+### Stale Data & Coherence
+While caching improves speed, it introduces a risk of **stale data**.
+- **Mitigation**: We use a short TTL (60s) and active invalidation on updates.
+- **Trade-off**: In distributed systems, perfect coherence is hard; we accept eventual consistency for user lists.
+
+---
 ## �👨‍💻 Author
 
 **SmartOPD Team**
