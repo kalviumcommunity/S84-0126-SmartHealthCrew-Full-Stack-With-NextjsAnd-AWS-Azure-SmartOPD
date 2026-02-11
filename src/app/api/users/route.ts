@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { handleError } from "@/lib/errorHandler";
+import { prisma } from "@/lib/prisma";
+import redis from "@/lib/redis";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretjwtkey";
 
@@ -20,10 +22,34 @@ export async function GET(req: Request) {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
+    // Check Cache
+    const cacheKey = "users:list";
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      console.log("Cache Hit");
+      return NextResponse.json({
+        success: true,
+        message: "Protected route access granted (Cached)",
+        user: decoded,
+        data: JSON.parse(cachedData),
+      });
+    }
+
+    console.log("Cache Miss - Fetching from DB");
+    // Fetch real data (Using Admin model as simple User equivalent for this demo)
+    const users = await prisma.admin.findMany({
+      select: { id: true, name: true, email: true, role: true },
+    });
+
+    // Cache data for 60 seconds (TTL)
+    await redis.set(cacheKey, JSON.stringify(users), "EX", 60);
+
     return NextResponse.json({
       success: true,
-      message: "Protected route access granted",
+      message: "Protected route access granted (Fetched)",
       user: decoded,
+      data: users,
     });
   } catch (error) {
     return handleError(error, "GET /api/users");
