@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { handleError } from "@/lib/errorHandler";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretjwtkey";
 
 export async function GET(req: Request) {
   try {
+    // Simulate database or API failure
+    // throw new Error("Database connection failed!");
+
     const header = req.headers.get("authorization");
     const token = header?.split(" ")[1];
 
@@ -21,10 +25,7 @@ export async function GET(req: Request) {
       message: "Protected route access granted",
       user: decoded,
     });
-  } catch {
-    return NextResponse.json(
-      { success: false, message: "Invalid or expired token" },
-      { status: 403 }
-    );
+  } catch (error) {
+    return handleError(error, "GET /api/users");
   }
 }
