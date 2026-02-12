@@ -20,4 +20,3 @@ export function handleError(error: unknown, context: string) {
 
   return NextResponse.json(errorResponse, { status: 500 });
 }
-}

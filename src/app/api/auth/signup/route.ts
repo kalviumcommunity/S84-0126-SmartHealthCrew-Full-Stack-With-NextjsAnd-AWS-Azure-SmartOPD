@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
+import redis from "@/lib/redis";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, password } = body;
+    const { email, password } = body;
 
-    const existingUser = await prisma.admin.findUnique({ where: { email } });
+    const existingUser = await prisma.admin.findUnique({
+      where: { email },
+    });
 
     if (existingUser) {
       return NextResponse.json(
@@ -19,17 +22,26 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.admin.create({
-      data: { name, email, password: hashedPassword, role: "admin" },
+      data: {
+        email,
+        password: hashedPassword,
+      },
     });
+
+    // Invalidate cache
+    await redis.del("users:list");
 
     return NextResponse.json({
       success: true,
       message: "Signup successful",
-      user: newUser,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+      },
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, message: "Signup failed", error },
+      { success: false, message: "Signup failed" },
       { status: 500 }
     );
   }
