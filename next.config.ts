@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /** @type {import('next').NextConfig} */
 
 const nextConfig: import("next").NextConfig = {

@@ -18,29 +18,43 @@ export default function Header() {
     <>
       <header className="bg-white/80 backdrop-blur-md text-slate-900 px-6 md:px-20 py-4 sticky top-0 z-50 flex justify-between items-center border-b border-slate-50">
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 hover:bg-slate-50 rounded-lg transition-colors group"
           >
             <Menu className="w-6 h-6 text-slate-600 group-hover:text-sky-500" />
           </button>
-          
-          <Link href="/" className="text-2xl font-black flex items-center gap-2">
+
+          <Link
+            href="/"
+            className="text-2xl font-black flex items-center gap-2"
+          >
             <div className="w-10 h-10 bg-sky-500 rounded-lg flex items-center justify-center text-white shadow-lg">
               ✚
             </div>
-            <span className="tracking-tighter uppercase hidden sm:inline">{APP_NAME}</span>
+            <span className="tracking-tighter uppercase hidden sm:inline">
+              {APP_NAME}
+            </span>
           </Link>
         </div>
 
         <nav className="hidden lg:flex items-center gap-8">
-          <Link href="/" className="nav-link font-bold text-slate-600 hover:text-sky-500 transition-colors">
+          <Link
+            href="/"
+            className="nav-link font-bold text-slate-600 hover:text-sky-500 transition-colors"
+          >
             Home
           </Link>
-          <Link href="/about" className="nav-link font-bold text-slate-600 hover:text-sky-500 transition-colors">
+          <Link
+            href="/about"
+            className="nav-link font-bold text-slate-600 hover:text-sky-500 transition-colors"
+          >
             About
           </Link>
-          <Link href="/news" className="nav-link font-bold text-slate-600 hover:text-sky-500 transition-colors">
+          <Link
+            href="/news"
+            className="nav-link font-bold text-slate-600 hover:text-sky-500 transition-colors"
+          >
             News
           </Link>
 
@@ -67,13 +81,15 @@ export default function Header() {
       </header>
 
       {/* Hospital Department Navigation Sidebar */}
-      <div 
+      <div
         className={`fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] transition-opacity duration-300 ${
-          isSidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          isSidebarOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsSidebarOpen(false)}
       >
-        <aside 
+        <aside
           className={`fixed left-0 top-0 h-full w-[320px] bg-white shadow-2xl z-[70] transition-transform duration-500 ease-out flex flex-col ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
@@ -81,10 +97,14 @@ export default function Header() {
         >
           <div className="p-8 border-b border-slate-50 flex justify-between items-center">
             <div>
-              <p className="text-[10px] font-black text-sky-500 uppercase tracking-widest mb-1">Navigation</p>
-              <h3 className="text-xl font-black text-slate-900 tracking-tight">Departments</h3>
+              <p className="text-[10px] font-black text-sky-500 uppercase tracking-widest mb-1">
+                Navigation
+              </p>
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                Departments
+              </h3>
             </div>
-            <button 
+            <button
               onClick={() => setIsSidebarOpen(false)}
               className="p-2 hover:bg-slate-50 rounded-xl transition-colors"
             >
@@ -116,7 +136,7 @@ export default function Header() {
           </div>
 
           <div className="p-8 border-t border-slate-50 bg-slate-50/30">
-            <Link 
+            <Link
               href="/admin/login"
               className="flex items-center gap-3 p-4 rounded-2xl bg-white border border-slate-100 text-slate-600 hover:text-slate-900 transition-all hover:shadow-sm"
             >

@@ -44,7 +44,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const savedUsers = localStorage.getItem("opd_users");
     const savedDoctors = localStorage.getItem("opd_doctors");
     const savedTokens = localStorage.getItem("opd_tokens");
 

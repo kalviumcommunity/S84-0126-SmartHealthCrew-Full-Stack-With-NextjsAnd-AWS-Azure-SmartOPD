@@ -19,19 +19,26 @@ const PatientJoinForm = () => {
   const searchParams = useSearchParams();
   const { addToken, doctors } = useStore();
 
+  const initialDept = searchParams.get("dept");
+  const defaultDept =
+    initialDept && (DEPARTMENTS as readonly string[]).includes(initialDept)
+      ? initialDept
+      : DEPARTMENTS[0];
+
   const [formData, setFormData] = useState({
     patientName: "",
     age: "",
     gender: "Male",
     phone: "",
     symptoms: "",
-    department: DEPARTMENTS[0],
+    department: defaultDept,
     preferredDoctorId: "",
   });
 
   useEffect(() => {
     const dept = searchParams.get("dept");
     if (dept && (DEPARTMENTS as readonly string[]).includes(dept)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData((prev) => {
         if (prev.department === dept) return prev;
         return { ...prev, department: dept };
