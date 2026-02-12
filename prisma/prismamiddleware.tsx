@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parse } from "cookie";
-import { verifyAdminToken } from "./auth";
+import { verifyAdminToken } from "@/lib/auth";
 
 export interface AuthenticatedRequest extends NextRequest {
   admin?: {

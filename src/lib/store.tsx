@@ -52,12 +52,35 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
       {
         id: "admin-1",
         name: "Super Admin",
-        email: "admin@smartopd.com",
+        email: "admin@hospital.com",
         role: Role.ADMIN,
+      },
+      {
+        id: "doctor-1",
+        name: "Dr. Emily",
+        email: "emily@hospital",
+        role: Role.DOCTOR,
       },
     ]);
 
-    if (savedDoctors) setDoctors(JSON.parse(savedDoctors));
+    // Ensure hardcoded doctor exists in doctors array
+    if (!savedDoctors) {
+      setDoctors([
+        {
+          id: "d-emily",
+          userId: "doctor-1",
+          name: "Dr. Emily",
+          email: "emily@hospital",
+          specialization: "General Medicine",
+          experience: "10 years",
+          department: "General Medicine",
+          status: DoctorStatus.APPROVED,
+          isQueuePaused: false,
+        },
+      ]);
+    } else {
+      setDoctors(JSON.parse(savedDoctors));
+    }
     if (savedTokens) setTokens(JSON.parse(savedTokens));
   }, []);
 
