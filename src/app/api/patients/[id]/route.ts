@@ -5,9 +5,13 @@ import { prisma } from "@/lib/prisma";
  * GET /api/patients/[id]
  * Retrieves a single patient by ID
  */
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  _: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const patientId = Number(params.id);
+    const { id } = await params;
+    const patientId = Number(id);
 
     if (isNaN(patientId)) {
       return NextResponse.json(
@@ -39,10 +43,11 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
  */
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const patientId = Number(params.id);
+    const { id } = await params;
+    const patientId = Number(id);
     const body = await req.json();
 
     if (isNaN(patientId)) {
@@ -72,10 +77,11 @@ export async function PATCH(
  */
 export async function DELETE(
   _: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const patientId = Number(params.id);
+    const { id } = await params;
+    const patientId = Number(id);
 
     if (isNaN(patientId)) {
       return NextResponse.json(
