@@ -27,7 +27,8 @@ export default function AdminLogin() {
 
     try {
       // Hardcoded Admin Credentials Check
-      if (email === "admin@hospital.com" && password === "admin123") {
+      const normalizedEmail = email.toLowerCase().trim();
+      if (normalizedEmail === "admin@hospital.com" && password === "admin123") {
         setCurrentUser({
           id: "admin-1",
           email: "admin@hospital.com",
@@ -75,11 +76,11 @@ export default function AdminLogin() {
             </label>
             <input
               required
-              type="email"
+              type="text"
               className="w-full px-4 py-3 bg-slate-100 rounded-xl border border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 placeholder-slate-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@smartopd.com"
+              placeholder="admin@hospital.com"
             />
           </div>
 

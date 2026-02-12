@@ -4,32 +4,47 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useStore } from "../../../lib/store";
-import { Role } from "../../../lib/types";
-import { LogIn, Lock, Mail, AlertTriangle, ShieldCheck } from "lucide-react";
+import { Role, DoctorStatus } from "../../../lib/types";
+import {
+  LogIn,
+  Lock,
+  Mail,
+  AlertTriangle,
+  ShieldCheck,
+  Clock,
+} from "lucide-react";
 
 export default function DoctorLogin() {
   const router = useRouter();
-  const { setCurrentUser } = useStore();
+  const { setCurrentUser, users, getDoctorByUserId } = useStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<DoctorStatus | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setStatus(null);
 
     // Simulation of network delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     try {
-      // Hardcoded Doctor Credentials Check
-      if (email === "emily@hospital" && password === "1234567890") {
+      const normalizedEmail = email.toLowerCase().trim();
+
+      // 1. Check Hardcoded Doctor (Dr. Emily)
+      if (
+        (normalizedEmail === "emily@hospital" ||
+          normalizedEmail === "emily@hospital.com") &&
+        password === "1234567890"
+      ) {
         setCurrentUser({
           id: "doctor-1",
-          email: "emily@hospital",
+          email: normalizedEmail,
           role: Role.DOCTOR,
           name: "Dr. Emily",
         });
@@ -37,8 +52,42 @@ export default function DoctorLogin() {
         return;
       }
 
-      // Fallback to real API if not hardcoded (optional, but we keep it for structure)
-      // Since we want frontend-only, we throw error for any other credential
+      // 2. Check Dynamic Users from Store
+      const foundUser = users.find(
+        (u) =>
+          u.email.toLowerCase() === normalizedEmail && u.role === Role.DOCTOR
+      );
+
+      if (foundUser) {
+        // Check password (for simplicity, we assume password matches if it exists in user object)
+        // or validate against what was stored during signup
+        if (foundUser.password && foundUser.password !== password) {
+          throw new Error("Invalid password");
+        }
+
+        const doctorProfile = getDoctorByUserId(foundUser.id);
+
+        if (!doctorProfile) {
+          throw new Error("Doctor profile not found");
+        }
+
+        if (doctorProfile.status === DoctorStatus.PENDING) {
+          setStatus(DoctorStatus.PENDING);
+          throw new Error("Your registration is still pending approval.");
+        }
+
+        if (doctorProfile.status === DoctorStatus.REJECTED) {
+          setStatus(DoctorStatus.REJECTED);
+          throw new Error("Your registration request has been declined.");
+        }
+
+        if (doctorProfile.status === DoctorStatus.APPROVED) {
+          setCurrentUser(foundUser);
+          router.push("/doctor/dashboard");
+          return;
+        }
+      }
+
       throw new Error("Invalid doctor credentials");
     } catch (err: unknown) {
       setError(
@@ -63,8 +112,18 @@ export default function DoctorLogin() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl border border-red-100 flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 shrink-0" />
+          <div
+            className={`mb-6 p-4 rounded-xl border flex items-start gap-3 ${
+              status === DoctorStatus.PENDING
+                ? "bg-amber-50 text-amber-700 border-amber-100"
+                : "bg-red-50 text-red-700 border-red-100"
+            }`}
+          >
+            {status === DoctorStatus.PENDING ? (
+              <Clock className="w-5 h-5 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 shrink-0" />
+            )}
             <p className="text-sm font-medium">{error}</p>
           </div>
         )}
@@ -76,11 +135,11 @@ export default function DoctorLogin() {
             </label>
             <input
               required
-              type="email"
+              type="text"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="doctor@hospital.com"
+              placeholder="emily@hospital"
             />
           </div>
 

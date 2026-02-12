@@ -16,7 +16,8 @@ interface StoreContextType {
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
   registerDoctor: (
-    doctor: Omit<Doctor, "id" | "status" | "isQueuePaused" | "userId">
+    doctor: Omit<Doctor, "id" | "status" | "isQueuePaused" | "userId">,
+    password?: string
   ) => void;
   approveDoctor: (id: string) => void;
   rejectDoctor: (id: string) => void;
@@ -27,6 +28,7 @@ interface StoreContextType {
   updateTokenStatus: (tokenId: string, status: TokenStatus) => void;
   pauseDoctorQueue: (doctorId: string, isPaused: boolean) => void;
   getDoctorByUserId: (userId: string) => Doctor | undefined;
+  updateDoctorStatus: (doctorId: string, status: DoctorStatus) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -39,16 +41,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // ✅ Hydrate from localStorage AFTER mount
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    const savedUsers = localStorage.getItem("opd_users");
     const savedDoctors = localStorage.getItem("opd_doctors");
     const savedTokens = localStorage.getItem("opd_tokens");
+    const savedCurrentUser = localStorage.getItem("opd_current_user");
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUsers([
+    // Default users that must always exist
+    const defaultUsers: User[] = [
       {
         id: "admin-1",
         name: "Super Admin",
@@ -61,9 +66,22 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
         email: "emily@hospital",
         role: Role.DOCTOR,
       },
-    ]);
+    ];
 
-    // Ensure hardcoded doctor exists in doctors array
+    if (savedUsers) {
+      const parsedUsers = JSON.parse(savedUsers) as User[];
+      const mergedUsers = [...defaultUsers];
+      parsedUsers.forEach((savedUser) => {
+        if (!mergedUsers.find((u) => u.id === savedUser.id)) {
+          mergedUsers.push(savedUser);
+        }
+      });
+
+      setUsers(mergedUsers);
+    } else {
+      setUsers(defaultUsers);
+    }
+
     if (!savedDoctors) {
       setDoctors([
         {
@@ -81,22 +99,33 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
     } else {
       setDoctors(JSON.parse(savedDoctors));
     }
+
     if (savedTokens) setTokens(JSON.parse(savedTokens));
+
+    if (savedCurrentUser) setCurrentUser(JSON.parse(savedCurrentUser));
+
+    setIsHydrated(true);
   }, []);
 
   // ✅ Persist changes safely
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!isHydrated || typeof window === "undefined") return;
 
     localStorage.setItem("opd_users", JSON.stringify(users));
     localStorage.setItem("opd_doctors", JSON.stringify(doctors));
     localStorage.setItem("opd_tokens", JSON.stringify(tokens));
-  }, [users, doctors, tokens]);
+    if (currentUser) {
+      localStorage.setItem("opd_current_user", JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem("opd_current_user");
+    }
+  }, [users, doctors, tokens, currentUser, isHydrated]);
 
   // ---------------- Doctor Registration ----------------
 
   const registerDoctor = (
-    doctorData: Omit<Doctor, "id" | "status" | "isQueuePaused" | "userId">
+    doctorData: Omit<Doctor, "id" | "status" | "isQueuePaused" | "userId">,
+    password?: string
   ) => {
     const timestamp = Date.now();
     const newUserId = `u-${timestamp}`;
@@ -107,6 +136,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
       name: doctorData.name,
       email: doctorData.email,
       role: Role.DOCTOR,
+      password: password || "1234567890", // Default password if none provided
     };
 
     const newDoctor: Doctor = {
@@ -124,11 +154,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
   // ---------------- Admin Actions ----------------
 
   const approveDoctor = (id: string) => {
-    setDoctors((prev) =>
-      prev.map((d) =>
+    setDoctors((prev) => {
+      const updatedDoctors = prev.map((d) =>
         d.id === id ? { ...d, status: DoctorStatus.APPROVED } : d
-      )
-    );
+      );
+
+      // Also update the corresponding user's role/status if needed
+      const doctor = updatedDoctors.find((d) => d.id === id);
+      if (doctor) {
+        setUsers((prevUsers) =>
+          prevUsers.map((u) =>
+            u.id === doctor.userId ? { ...u, role: Role.DOCTOR } : u
+          )
+        );
+      }
+
+      return updatedDoctors;
+    });
   };
 
   const rejectDoctor = (id: string) => {
@@ -197,6 +239,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
     return doctors.find((d) => d.userId === userId);
   };
 
+  const updateDoctorStatus = (doctorId: string, status: DoctorStatus) => {
+    setDoctors((prev) =>
+      prev.map((d) => (d.id === doctorId ? { ...d, status } : d))
+    );
+  };
+
   return (
     <StoreContext.Provider
       value={{
@@ -213,6 +261,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({
         updateTokenStatus,
         pauseDoctorQueue,
         getDoctorByUserId,
+        updateDoctorStatus,
       }}
     >
       {children}

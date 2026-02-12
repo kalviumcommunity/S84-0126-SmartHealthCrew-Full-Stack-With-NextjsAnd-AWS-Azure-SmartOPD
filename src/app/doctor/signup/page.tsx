@@ -32,15 +32,18 @@ export default function DoctorSignup() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    registerDoctor({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      department: formData.department,
-      licenseNo: formData.licenseNo,
-      experience: parseInt(formData.experience, 10),
-      url: "",
-    });
+    registerDoctor(
+      {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        department: formData.department,
+        licenseNo: formData.licenseNo,
+        experience: parseInt(formData.experience, 10),
+        url: "",
+      },
+      formData.password
+    );
 
     alert(
       "Signup request submitted! Your account is under review by the administrator."

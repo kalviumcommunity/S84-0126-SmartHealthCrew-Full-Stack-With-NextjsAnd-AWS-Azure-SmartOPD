@@ -149,13 +149,15 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 text-right flex gap-2 justify-end">
                       <button
                         onClick={() => approveDoctor(doc.id)}
-                        className="p-2 bg-green-100 text-green-700 rounded-lg"
+                        className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                        title="Approve Doctor"
                       >
                         <Check className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => rejectDoctor(doc.id)}
-                        className="p-2 bg-red-100 text-red-700 rounded-lg"
+                        className="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                        title="Reject Doctor"
                       >
                         <X className="w-5 h-5" />
                       </button>
