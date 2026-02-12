@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 "use client";
 
 import Link from "next/link";
@@ -47,7 +46,7 @@ export default function Header() {
         </Link>
 
         <Link
-          href="/join"
+          href="/getToken"
           className="px-6 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-full shadow-lg"
         >
           Get Token

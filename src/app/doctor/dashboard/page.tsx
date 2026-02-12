@@ -1,7 +1,7 @@
 "use client";
 
-import { useStore } from "@/lib/store";
-import { TokenStatus } from "@/lib/types";
+import { useStore } from "../../../lib/store";
+import { TokenStatus } from "../../../lib/types";
 import {
   Users,
   Play,
