@@ -7,11 +7,11 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(
   _: Request,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params;
-    const patientId = Number(params.id);
+    const { id } = await params;
+    const patientId = Number(id);
 
     if (isNaN(patientId)) {
       return NextResponse.json(
@@ -43,11 +43,11 @@ export async function GET(
  */
 export async function PATCH(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params;
-    const patientId = Number(params.id);
+    const { id } = await params;
+    const patientId = Number(id);
     const body = await req.json();
 
     if (isNaN(patientId)) {
@@ -77,11 +77,11 @@ export async function PATCH(
  */
 export async function DELETE(
   _: Request,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params;
-    const patientId = Number(params.id);
+    const { id } = await params;
+    const patientId = Number(id);
 
     if (isNaN(patientId)) {
       return NextResponse.json(

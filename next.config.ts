@@ -23,4 +23,4 @@ const nextConfig: import("next").NextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
