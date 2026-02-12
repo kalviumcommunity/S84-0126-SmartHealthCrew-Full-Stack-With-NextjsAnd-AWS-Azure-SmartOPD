@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
     // Create admin
     const admin = await prisma.admin.create({
       data: {
+        name: validated.name,
         email: validated.email,
         password: hashedPassword,
         role: "admin",
