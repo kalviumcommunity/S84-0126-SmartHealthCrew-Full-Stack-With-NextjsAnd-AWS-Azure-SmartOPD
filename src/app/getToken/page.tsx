@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useStore } from "../../lib/store";
 import { DEPARTMENTS } from "../../lib/types";
 import {
@@ -14,8 +14,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const PatientJoin = () => {
+const PatientJoinForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { addToken, doctors } = useStore();
 
   const [formData, setFormData] = useState({
@@ -27,6 +28,16 @@ const PatientJoin = () => {
     department: DEPARTMENTS[0],
     preferredDoctorId: "",
   });
+
+  useEffect(() => {
+    const dept = searchParams.get("dept");
+    if (dept && (DEPARTMENTS as readonly string[]).includes(dept)) {
+      setFormData((prev) => {
+        if (prev.department === dept) return prev;
+        return { ...prev, department: dept };
+      });
+    }
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,13 +205,21 @@ const PatientJoin = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2"
+            className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg shadow-blue-100"
           >
             Generate Token <ChevronRight className="w-5 h-5" />
           </button>
         </form>
       </div>
     </div>
+  );
+};
+
+const PatientJoin = () => {
+  return (
+    <Suspense fallback={<div className="p-20 text-center">Loading...</div>}>
+      <PatientJoinForm />
+    </Suspense>
   );
 };
 
