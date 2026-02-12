@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useStore } from "../../../lib/store";
+import { Role } from "../../../lib/types";
 import { LogIn, Lock, Mail, AlertTriangle, ShieldCheck } from "lucide-react";
 
 export default function DoctorLogin() {
@@ -20,40 +21,25 @@ export default function DoctorLogin() {
     setLoading(true);
     setError("");
 
+    // Simulation of network delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     try {
-      const response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      let data;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        console.error("Non-JSON response:", text);
-        throw new Error(
-          `Server error: ${response.status} ${response.statusText}`
-        );
+      // Hardcoded Doctor Credentials Check
+      if (email === "emily@hospital" && password === "1234567890") {
+        setCurrentUser({
+          id: "doctor-1",
+          email: "emily@hospital",
+          role: Role.DOCTOR,
+          name: "Dr. Emily",
+        });
+        router.push("/doctor/dashboard");
+        return;
       }
 
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      // Set current user in store for UI purposes
-      setCurrentUser({
-        id: data.admin.id,
-        email: data.admin.email,
-        role: data.admin.role,
-        name: data.admin.email.split("@")[0], // Fallback name
-      });
-
-      router.push("/doctor/dashboard");
+      // Fallback to real API if not hardcoded (optional, but we keep it for structure)
+      // Since we want frontend-only, we throw error for any other credential
+      throw new Error("Invalid doctor credentials");
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"

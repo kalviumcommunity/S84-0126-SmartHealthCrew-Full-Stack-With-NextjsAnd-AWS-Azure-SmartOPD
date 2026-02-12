@@ -9,7 +9,7 @@ import { ShieldCheck, Lock, Mail, AlertTriangle } from "lucide-react";
 
 export default function AdminLogin() {
   const router = useRouter();
-  const { users, setCurrentUser } = useStore();
+  const { setCurrentUser } = useStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,37 +22,23 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
 
+    // Simulation of network delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     try {
-      const response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      let data;
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        console.error("Non-JSON response:", text);
-        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      // Hardcoded Admin Credentials Check
+      if (email === "admin@hospital.com" && password === "admin123") {
+        setCurrentUser({
+          id: "admin-1",
+          email: "admin@hospital.com",
+          role: Role.ADMIN,
+          name: "Super Admin",
+        });
+        router.push("/admin/dashboard");
+        return;
       }
 
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      setCurrentUser({
-        id: data.admin.id,
-        email: data.admin.email,
-        role: data.admin.role,
-        name: data.admin.email.split("@")[0],
-      });
-
-      router.push("/admin/dashboard");
+      throw new Error("Invalid admin credentials");
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"
