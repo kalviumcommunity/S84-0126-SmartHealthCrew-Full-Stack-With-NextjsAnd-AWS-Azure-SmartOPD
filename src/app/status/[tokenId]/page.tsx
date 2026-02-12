@@ -20,33 +20,48 @@ const PatientStatus = () => {
   const params = useParams();
   const tokenId = params?.tokenId as string;
 
-  const { tokens } = useStore();
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const token = tokens.find((t) => t.id === tokenId);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
+  const refreshStatus = () => {
+    setIsRefreshing(true);
+    // In a real app, this would be a fetch call to /api/queue/status/[tokenId]
+    setTimeout(() => {
       setLastRefreshed(new Date());
-    }, 15000);
+      setIsRefreshing(false);
+    }, 800);
+  };
 
+  useEffect(() => {
+    const timer = setInterval(refreshStatus, 30000); // Auto refresh every 30s
     return () => clearInterval(timer);
   }, []);
 
   if (!token) {
     return (
-      <div className="max-w-2xl mx-auto py-20 px-4 text-center">
-        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Token Not Found</h2>
-        <p className="text-gray-600 mb-8">
-          We couldn&apos;t find the token you&apos;re looking for.
-        </p>
-        <Link href="/" className="text-blue-600 font-medium underline">
-          Return to Home
-        </Link>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-[40px] shadow-xl border border-slate-100 p-12 text-center">
+          <div className="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-6">
+            ⚠️
+          </div>
+          <h2 className="text-3xl font-black text-slate-900 mb-4">
+            Token Not Found
+          </h2>
+          <p className="text-slate-500 mb-10 leading-relaxed">
+            We couldn&apos;t find the token session you&apos;re looking for. It
+            might have expired or been removed.
+          </p>
+          <Link href="/" className="btn-primary w-full inline-block">
+            Return to Home
+          </Link>
+        </div>
       </div>
     );
   }
+
+  // UI rendering logic follows...
 
   const departmentTokens = tokens.filter(
     (t) => t.department === token.department
