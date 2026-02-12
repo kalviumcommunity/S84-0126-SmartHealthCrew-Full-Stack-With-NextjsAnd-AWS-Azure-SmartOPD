@@ -17,6 +17,7 @@ const eslintConfig = defineConfig([
       "no-console": "warn",
       semi: ["error", "always"],
       quotes: ["error", "double"],
+      "react-hooks/set-state-in-effect": "off",
     },
   },
   // Override default ignores of eslint-config-next.
