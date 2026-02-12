@@ -15,17 +15,50 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    // MVP: single pre-configured admin
-    const admin = users.find((u) => u.role === Role.ADMIN && u.email === email);
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (admin && password === "admin123") {
-      setCurrentUser(admin);
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      setCurrentUser({
+        id: data.admin.id,
+        email: data.admin.email,
+        role: data.admin.role,
+        name: data.admin.email.split("@")[0],
+      });
+
       router.push("/admin/dashboard");
-    } else {
-      setError("Invalid admin credentials.");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,9 +116,10 @@ export default function AdminLogin() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Access Dashboard
+            {loading ? "Authenticating..." : "Access Dashboard"}
           </button>
         </form>
       </div>
