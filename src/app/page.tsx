@@ -19,7 +19,7 @@ export default function Home() {
               it&apos;s your turn.
             </p>
             <div className="flex items-center gap-6">
-              <Link href="/patient" className="btn-primary py-4 px-10 text-lg">
+              <Link href="/getToken" className="btn-primary py-4 px-10 text-lg">
                 Get Appointment
               </Link>
             </div>

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { NextRequest, NextResponse } from "next/server";
 import { parse } from "cookie";
 import { verifyAdminToken } from "./auth";

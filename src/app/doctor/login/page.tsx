@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useStore } from "@/lib/store";
-import { DoctorStatus, Role } from "@/lib/types";
+import { useStore } from "../../../lib/store";
+import { DoctorStatus, Role } from "../../../lib/types";
 import { LogIn, Lock, Mail, AlertTriangle, ShieldCheck } from "lucide-react";
 
 export default function DoctorLogin() {
@@ -14,38 +14,44 @@ export default function DoctorLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    const user = users.find((u) => u.email === email && u.role === Role.DOCTOR);
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!user) {
-      setError("Doctor not found with this email.");
-      return;
-    }
+      const data = await response.json();
 
-    const doctor = doctors.find((d) => d.userId === user.id);
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
 
-    if (!doctor) {
-      setError("Technical error: Doctor profile missing.");
-      return;
-    }
+      // Set current user in store for UI purposes
+      setCurrentUser({
+        id: data.admin.id,
+        email: data.admin.email,
+        role: data.admin.role,
+        name: data.admin.email.split("@")[0], // Fallback name
+      });
 
-    if (doctor.status === DoctorStatus.PENDING) {
-      setError("Your account is under review. Please wait for admin approval.");
-      return;
-    }
-
-    if (doctor.status === DoctorStatus.REJECTED) {
+      router.push("/doctor/dashboard");
+    } catch (err: unknown) {
       setError(
-        "Your registration request was rejected. Contact admin for details."
+        err instanceof Error ? err.message : "An unexpected error occurred"
       );
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    setCurrentUser(user);
-    router.push("/doctor/dashboard");
   };
 
   return (
@@ -99,9 +105,19 @@ export default function DoctorLogin() {
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition shadow-lg"
+            disabled={loading}
+            className={`w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition shadow-lg flex items-center justify-center gap-2 ${
+              loading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            Login
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
 
           <div className="pt-6 border-t border-gray-100 text-center">
