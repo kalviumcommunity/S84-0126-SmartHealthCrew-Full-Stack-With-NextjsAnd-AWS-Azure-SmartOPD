@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    container_name: nextjs_app
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://neondb_owner:npg_S4ka2JemvPCx@ep-plain-boat-ah34ezh4-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      - JWT_SECRET=supersecret123   
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=development       
+    depends_on:
+      - redis
+    networks:
+      - localnet
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    networks:
+      - localnet
+
+networks:
+  localnet:
+    driver: bridge
