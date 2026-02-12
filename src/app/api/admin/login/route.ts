@@ -10,14 +10,12 @@ import { ERROR_CODES } from "@/lib/errorCodes";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log("Login attempt for:", body.email);
     const validated = adminLoginSchema.parse(body);
 
     // Find admin by email
     const admin = await prisma.admin.findUnique({
       where: { email: validated.email },
     });
-    console.log("Admin found:", admin ? "Yes" : "No");
 
     if (!admin) {
       return sendError(
@@ -32,7 +30,6 @@ export async function POST(req: NextRequest) {
       validated.password,
       admin.password
     );
-    console.log("Password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
       return sendError(
