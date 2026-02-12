@@ -162,40 +162,70 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto grid grid-cols-3 gap-12">
           {SEED_DOCTORS.map((doc, i) => (
-            <div key={i} className="text-center group">
-              <div className="doctor-image-container w-full aspect-4/5 mb-8 group-hover:shadow-2xl transition-all">
-                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-[10rem] grayscale group-hover:grayscale-0 transition-all">
-                  <Image
-                    src={doc.url}
-                    alt="Doctor"
-                    width={400}
-                    height={500}
-                    className="rounded-3xl"
-                  />
+            <div
+              key={i}
+              className="relative p-6 rounded-[40px] bg-white border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group overflow-hidden"
+            >
+              {/* Decorative Background Element */}
+              <div className="absolute -top-24 -right-24 w-48 h-48 bg-sky-50 rounded-full group-hover:bg-sky-100 transition-colors duration-500 -z-10"></div>
+
+              <div className="relative aspect-[4/5] rounded-[30px] overflow-hidden mb-8 bg-slate-50 border border-slate-50 group-hover:border-sky-100 transition-colors">
+                <Image
+                  src={doc.url}
+                  alt={doc.name}
+                  fill
+                  className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                />
+
+                {/* Glassmorphism Badge */}
+                <div className="absolute bottom-4 left-4 right-4 backdrop-blur-md bg-white/70 border border-white/20 p-4 rounded-2xl transform translate-y-12 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                  <p className="text-xs font-black text-sky-600 uppercase tracking-widest mb-1">
+                    Experience
+                  </p>
+                  <p className="text-sm font-bold text-slate-800">
+                    {doc.experience}+ Years in Field
+                  </p>
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-1">
-                {doc.name}
-              </h3>
-              <p className="text-sm font-bold text-sky-500 uppercase tracking-widest mb-4">
-                {doc.department}
-              </p>
-              <div className="flex justify-center gap-4">
-                {["fb", "tw", "ln"].map((s) => (
-                  <div
-                    key={s}
-                    className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 hover:text-sky-500 cursor-pointer"
-                  >
-                    {s}
+
+              <div className="text-left">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-2xl font-black text-slate-900 group-hover:text-sky-600 transition-colors">
+                    {doc.name}
+                  </h3>
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-all duration-500">
+                    →
                   </div>
-                ))}
+                </div>
+                <p className="text-sm font-bold text-sky-500 uppercase tracking-widest mb-6">
+                  {doc.department}
+                </p>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2">
+                    {[1, 2, 3].map((star) => (
+                      <div
+                        key={star}
+                        className="w-6 h-6 rounded-full bg-yellow-400 border-2 border-white flex items-center justify-center text-[10px]"
+                      >
+                        ⭐
+                      </div>
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold text-slate-400">
+                    4.9 (120+ Reviews)
+                  </span>
+                </div>
               </div>
             </div>
           ))}
         </div>
         <div className="mt-20 text-center">
-          <Link href="/patient" className="btn-outline px-12">
-            View All Doctors
+          <Link href="/doctor/login" className="btn-outline px-12 group">
+            Book Appointment{" "}
+            <span className="inline-block group-hover:translate-x-2 transition-transform ml-2">
+              →
+            </span>
           </Link>
         </div>
       </section>
