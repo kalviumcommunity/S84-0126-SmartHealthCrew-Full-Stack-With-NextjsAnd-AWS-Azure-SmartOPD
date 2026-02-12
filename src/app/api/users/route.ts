@@ -3,10 +3,14 @@ import jwt from "jsonwebtoken";
 import { handleError } from "@/lib/errorHandler";
 import { prisma } from "@/lib/prisma";
 import redis from "@/lib/redis";
+import { logger } from "@/lib/logger";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretjwtkey";
 
 export async function GET(req: Request) {
+  const requestId = req.headers.get("x-request-id");
+  logger.info("Fetching users list", { requestId });
+
   try {
     // Simulate database or API failure
     // throw new Error("Database connection failed!");
@@ -52,6 +56,6 @@ export async function GET(req: Request) {
       data: users,
     });
   } catch (error) {
-    return handleError(error, "GET /api/users");
+    return handleError(error, "GET /api/users", requestId);
   }
 }

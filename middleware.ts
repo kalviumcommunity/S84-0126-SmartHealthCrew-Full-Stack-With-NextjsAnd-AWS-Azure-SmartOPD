@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminToken } from "@/lib/auth";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * RBAC Middleware for SmartOPD
@@ -18,7 +19,12 @@ import { verifyAdminToken } from "@/lib/auth";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Identify route types
+  // Add request ID for logging and tracing
+  const requestId = uuidv4();
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-request-id", requestId);
+
+  // Identity route types
   const isAdminRoute = pathname.startsWith("/api/admin");
   const isUserRoute = pathname.startsWith("/api/users");
 
@@ -82,7 +88,11 @@ export async function middleware(req: NextRequest) {
   }
 
   // Valid token and authorized role - proceed
-  return NextResponse.next();
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 // Configure which routes the middleware should run on
