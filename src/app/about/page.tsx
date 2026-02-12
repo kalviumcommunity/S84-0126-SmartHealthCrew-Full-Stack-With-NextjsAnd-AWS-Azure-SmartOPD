@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-/* eslint-disable prettier/prettier */
 const About = () => {
   return (
     <div className="py-24 px-20 max-w-5xl mx-auto">

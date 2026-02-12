@@ -19,6 +19,7 @@ const AVG_CONSULTATION_TIME = 10;
 const PatientStatus = () => {
   const params = useParams();
   const tokenId = params?.tokenId as string;
+  const { tokens } = useStore();
 
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);

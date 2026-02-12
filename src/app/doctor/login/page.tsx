@@ -4,12 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useStore } from "../../../lib/store";
-import { DoctorStatus, Role } from "../../../lib/types";
 import { LogIn, Lock, Mail, AlertTriangle, ShieldCheck } from "lucide-react";
 
 export default function DoctorLogin() {
   const router = useRouter();
-  const { users, doctors, setCurrentUser } = useStore();
+  const { setCurrentUser } = useStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +36,9 @@ export default function DoctorLogin() {
       } else {
         const text = await response.text();
         console.error("Non-JSON response:", text);
-        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Server error: ${response.status} ${response.statusText}`
+        );
       }
 
       if (!response.ok) {

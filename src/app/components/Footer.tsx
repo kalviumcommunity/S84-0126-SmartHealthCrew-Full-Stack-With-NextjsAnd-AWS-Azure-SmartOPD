@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 "use client";
 import { usePathname } from "next/navigation";
 import { APP_NAME } from "@/lib/constants";

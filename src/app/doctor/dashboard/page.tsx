@@ -5,10 +5,8 @@ import { TokenStatus } from "../../../lib/types";
 import {
   Users,
   Play,
-  CheckCircle,
   Pause,
   PlayCircle,
-  Clock,
   Stethoscope,
   AlertCircle,
   TrendingUp,
@@ -324,24 +322,6 @@ export default function DoctorDashboard() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Stat({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div className="bg-white p-6 rounded-2xl border shadow-sm">
-      <div className="text-indigo-500 mb-2">{icon}</div>
-      <p className="text-xs uppercase text-gray-500 font-bold">{label}</p>
-      <p className="text-3xl font-black">{value}</p>
     </div>
   );
 }
