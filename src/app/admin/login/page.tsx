@@ -18,6 +18,7 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
+    // TODO: Enhance error handling for login
     e.preventDefault();
     setLoading(true);
     setError("");
