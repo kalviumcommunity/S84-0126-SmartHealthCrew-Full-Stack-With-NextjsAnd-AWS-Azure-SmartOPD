@@ -8,6 +8,7 @@ import { ERROR_CODES } from "@/lib/errorCodes";
  * Returns the current live queue state for the public broadcast
  */
 export async function GET(req: NextRequest) {
+  // TODO: Implement caching for this route
   try {
     const patients = await prisma.patient.findMany({
       where: {
