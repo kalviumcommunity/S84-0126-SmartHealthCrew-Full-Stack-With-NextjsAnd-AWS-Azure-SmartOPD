@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function DoctorDashboard() {
+  // TODO: Add refresh button for doctor dashboard
   const {
     currentUser,
     getDoctorByUserId,
